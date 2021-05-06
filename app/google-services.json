@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "970425337767",
+    "project_id": "clova-102e8",
+    "storage_bucket": "clova-102e8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970425337767:android:70f6b3f0659087c6cc9882",
+        "android_client_info": {
+          "package_name": "com.example.clova"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "970425337767-i0fqh9rki2edp5ii0k5i7piuqcsnj9s2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDT_Lsswprx40kQmve1UJ5Nj4-9M0Fr9vs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "970425337767-i0fqh9rki2edp5ii0k5i7piuqcsnj9s2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
