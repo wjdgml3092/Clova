@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         user_auth = FirebaseAuth.getInstance(); //로그아웃 위해 필요함
 
-        FirebaseUser user = user_auth.getCurrentUser();
+        FirebaseUser user = user_auth.getCurrentUser(); //현재 사용자 받아오기
 
         //firebase 정의
         final FirebaseFirestore user_table = FirebaseFirestore.getInstance();

@@ -3,7 +3,6 @@ package com.example.clova;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,7 +22,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
-    private FirebaseUser currentUser;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private EditText editTextEmail;
     private EditText editTextPassword;
@@ -49,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!editTextEmail.getText().toString().equals("") && !editTextPassword.getText().toString().equals("")) {
                     loginUser(editTextEmail.getText().toString(), editTextPassword.getText().toString(), user);
+                    // loginUser 함수 call -> dialog 제어, db에서 유저정보 찾아서 로그인 success
                 } else {
                     Toast.makeText(LoginActivity.this, "계정과 비밀번호를 입력하세요.", Toast.LENGTH_LONG).show();
                 }
@@ -59,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
-                if (user != null) {
+                if (user != null) { //사용자 정보가 있으면,
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                 }
@@ -134,6 +133,7 @@ public class LoginActivity extends AppCompatActivity {
         });
         dlg.show();
     }
+
     @Override
     protected void onStart() { //자동로그인
         super.onStart();
