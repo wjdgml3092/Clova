@@ -41,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/email"
+        android:text="이메일 인증이 가능한 이메일을 넣어주세요. \n 로그인할 때 이메일 인증을 해야 사용가능합니다."
         android:layout_gravity="center"/>
     ​
     <EditText
@@ -50,6 +51,7 @@
         android:layout_gravity="center"
         android:ems="10"
         android:hint="Password"
+        android:layout_marginTop="10dp"
         android:inputType="textPassword"
         android:textColor="@android:color/black" />
 

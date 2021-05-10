@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,14 +16,18 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.regex.Pattern;
 
 public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private EditText editTextEmail, editTextPassword;
-    private Button buttonJoin;
+    private Button btn_join;
     private TextView email, password;
+
+    //이메일 인증
+    FirebaseUser user;
 
     //비밀번호 정규식
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");
@@ -39,17 +42,17 @@ public class SignUpActivity extends AppCompatActivity {
         editTextPassword = (EditText) findViewById(R.id.editText_passWord);
         email = findViewById(R.id.email);
         password = findViewById(R.id.pwd);
-        buttonJoin = (Button) findViewById(R.id.btn_join);
+        btn_join = (Button) findViewById(R.id.btn_join);
 
-        buttonJoin.setOnClickListener(new View.OnClickListener() {
+        user = firebaseAuth.getCurrentUser(); //이메일 인증 함수 내에서 사용할 객체체
+
+        btn_join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!editTextEmail.getText().toString().equals("") && !editTextPassword.getText().toString().equals("")) {
                     // 이메일과 비밀번호가 공백이 아닌 경우
                     createUser(editTextEmail.getText().toString(), editTextPassword.getText().toString(), password);
-                }
-
-                else {
+                } else {
                     // 이메일과 비밀번호가 공백인 경우
                     Toast.makeText(SignUpActivity.this, "계정과 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show();
                 }
