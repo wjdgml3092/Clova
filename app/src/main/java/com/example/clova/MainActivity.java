@@ -3,201 +3,146 @@ package com.example.clova;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.google.firebase.firestore.Source;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText et_user_name, et_user_email;
-    Button btn_save;
-
-    // 파이어베이스 데이터 쓰기 레퍼런스 객체
-    private DatabaseReference mDatabase;
-
-    // 이미지 업로드
-    private static final String TAG = "MainActivity5";
-
-    private Button btChoose;
-    private Button btUpload;
-    private ImageView ivPreview;
-    private Uri filePath;
+    TextView tex1, tex2;
+    EditText me;
+    Button btn1, btn2, btn3;
+    String user_id = null;
+    private FirebaseAuth user_auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        et_user_name = findViewById(R.id.et_user_name);
-        et_user_email = findViewById(R.id.et_user_email);
-        btn_save = findViewById(R.id.btn_save);
+        tex1 = findViewById(R.id.te1);
+        tex2= findViewById(R.id.te2);
+        btn1 = findViewById(R.id.btn1);
+        btn2 = findViewById(R.id.btn2);
+        btn3 = findViewById(R.id.btn3);
+        me = findViewById(R.id.me);        
 
-        btChoose = (Button) findViewById(R.id.bt_choose);
-        btUpload = (Button) findViewById(R.id.bt_upload);
-        ivPreview = (ImageView) findViewById(R.id.iv_preview);
+        user_auth = FirebaseAuth.getInstance(); //로그아웃 위해 필요함
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         //firebase 정의
-        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        final FirebaseFirestore user_table = FirebaseFirestore.getInstance();
+        
+        if (user != null) {
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+           tex1.setText(email);
 
-        btn_save.setOnClickListener(new View.OnClickListener() {
+            // Check if user's email is verified
+            boolean emailVerified = user.isEmailVerified();
+
+            String uid = user.getUid();
+            user_id = uid; // 아이디 변수에 넣기
+            tex2.setText(uid);
+        }
+        else{
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        btn1.setOnClickListener(new View.OnClickListener() { //로그아웃
             @Override
             public void onClick(View v) {
-                String name = et_user_name.getText().toString();
-                String email = et_user_email.getText().toString();
+                user_auth.signOut();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
-                // Create a new user with a first and last name
-                Map<String, Object> user = new HashMap<>();
-                user.put("name", name);
-                user.put("email", email);
-
-                // Add a new document with a generated ID
-                db.collection("User")
-                        .add(user)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        btn2.setOnClickListener(new View.OnClickListener() { //회원탈퇴
+            @Override
+            public void onClick(View v) {
+                user.delete()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.d("firebase", "DocumentSnapshot added with ID: " + documentReference.getId());
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("firebase", "Error adding document", e);
-                            }
-                        });
-
-                db.collection("User")
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Log.d("firebase", document.getId() + " => " + document.getData());
-                                    }
-                                } else {
-                                    Log.w("firebase", "Error getting documents.", task.getException());
+                                    Toast.makeText(MainActivity.this, "계정이 삭제 되었습니다.", Toast.LENGTH_LONG).show();
+                                    filed_Delete(user_table, user_id);
+                                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                                    finish();
                                 }
                             }
                         });
             }
         });
-        //버튼 클릭 이벤트
-        btChoose.setOnClickListener(new View.OnClickListener() {
+        
+        btn3.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                //이미지를 선택
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "이미지를 선택하세요."), 0);
+            public void onClick(View v) {
+                String message = me.getText().toString();
+
+                Map<String, Object> user_mes = new HashMap<>();
+                user_mes.put("message", message);
+
+                user_table.collection("User").document(user_id)
+                        .set(user_mes)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("User", "DocumentSnapshot successfully written!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("User", "Error writing document", e);
+                            }
+                        });
             }
         });
-
-        btUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //업로드
-                uploadFile();
-            }
-        });
-    }
-    //결과 처리
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //request코드가 0이고 OK를 선택했고 data에 뭔가가 들어 있다면
-        if(requestCode == 0 && resultCode == RESULT_OK){
-            filePath = data.getData();
-            Log.d(TAG, "uri:" + String.valueOf(filePath));
-            try {
-                //Uri 파일을 Bitmap으로 만들어서 ImageView에 집어 넣는다.
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                ivPreview.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
-    //upload the file
-    private void uploadFile() {
-        //업로드할 파일이 있으면 수행
-        if (filePath != null) {
-            //업로드 진행 Dialog 보이기
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("업로드중...");
-            progressDialog.show();
+    void filed_Delete(FirebaseFirestore user_table, String user_id){
+    //    DocumentReference docRef = user_table.collection("User").document(user_id);
 
-            //storage
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-
-            //Unique한 파일명을 만들자.
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMHH_mmss");
-            Date now = new Date();
-            String filename = formatter.format(now) + ".png";
-            //storage 주소와 폴더 파일명을 지정해 준다.
-            StorageReference storageRef = storage.getReferenceFromUrl("gs://clova-102e8.appspot.com").child("images/" + filename);
-            //올라가거라...
-            storageRef.putFile(filePath)
-                    //성공시
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
-                            Toast.makeText(getApplicationContext(), "업로드 완료!", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    //실패시
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            progressDialog.dismiss();
-                            Toast.makeText(getApplicationContext(), "업로드 실패!", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    //진행중
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            @SuppressWarnings("VisibleForTests") //이걸 넣어 줘야 아랫줄에 에러가 사라진다. 넌 누구냐?
-                                    double progress = (100 * taskSnapshot.getBytesTransferred()) /  taskSnapshot.getTotalByteCount();
-                            //dialog에 진행률을 퍼센트로 출력해 준다
-                            progressDialog.setMessage("Uploaded " + ((int) progress) + "% ...");
-                        }
-                    });
-        } else {
-            Toast.makeText(getApplicationContext(), "파일을 먼저 선택하세요.", Toast.LENGTH_SHORT).show();
-        }
+        user_table.collection("User").document(user_id)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("User-delete", "DocumentSnapshot successfully deleted!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("User-delete", "Error deleting document", e);
+                    }
+                });
     }
-
 }
