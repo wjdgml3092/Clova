@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,13 +18,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Source;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     TextView tex1, tex2;
     EditText me;
-    Button btn1, btn2, btn3;
+    Button bnt_logout, btn_memberdelete, btn_mess;
     String user_id = null;
     private FirebaseAuth user_auth;
 
@@ -44,14 +38,15 @@ public class MainActivity extends AppCompatActivity {
 
         tex1 = findViewById(R.id.te1);
         tex2= findViewById(R.id.te2);
-        btn1 = findViewById(R.id.btn1);
-        btn2 = findViewById(R.id.btn2);
-        btn3 = findViewById(R.id.btn3);
+        bnt_logout = findViewById(R.id.btn1);
+        btn_memberdelete = findViewById(R.id.btn2);
+        btn_mess = findViewById(R.id.btn3);
         me = findViewById(R.id.me);        
 
         user_auth = FirebaseAuth.getInstance(); //로그아웃 위해 필요함
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = user_auth.getCurrentUser();
+
         //firebase 정의
         final FirebaseFirestore user_table = FirebaseFirestore.getInstance();
         
@@ -73,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        btn1.setOnClickListener(new View.OnClickListener() { //로그아웃
+        bnt_logout.setOnClickListener(new View.OnClickListener() { //로그아웃
             @Override
             public void onClick(View v) {
                 user_auth.signOut();
@@ -83,9 +78,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btn2.setOnClickListener(new View.OnClickListener() { //회원탈퇴
+        btn_memberdelete.setOnClickListener(new View.OnClickListener() { //회원탈퇴
             @Override
             public void onClick(View v) {
+                Log.d("delete-member-btnclick", "버튼을 누르긴 했어,,");
                 user.delete()
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -93,15 +89,19 @@ public class MainActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(MainActivity.this, "계정이 삭제 되었습니다.", Toast.LENGTH_LONG).show();
                                     filed_Delete(user_table, user_id);
+                                    Log.d("delete-member", "성공");
                                     startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                                     finish();
+                                }
+                                else{
+                                    Log.d("delete-member-err", "탈퇴 실패");
                                 }
                             }
                         });
             }
         });
         
-        btn3.setOnClickListener(new View.OnClickListener() {
+        btn_mess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String message = me.getText().toString();
