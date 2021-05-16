@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        Log.d("into", "로그인이야");
         firebaseAuth = FirebaseAuth.getInstance(); // 파이어베이스 객체 얻기
         firebaseAuth.useAppLanguage(); // 사용자 디바이스 언어에 맞게 이메일 언어 보내기
         FirebaseUser user = firebaseAuth.getCurrentUser(); //현재 사용자 정보
@@ -63,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (firebaseAuth.getCurrentUser() != null){
                     //Do anything here which needs to be done after user is set is complete
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
                 }
                 else {
                 }
