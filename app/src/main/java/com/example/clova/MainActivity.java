@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("into", "메인이야");
 
-
         bottomNavigationView = findViewById(R.id.bottomNavi);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
