@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="#ffffff"
@@ -8,56 +8,25 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textSize="20dp"
-        android:textAlignment="center"
-        android:text="실패!"
-        android:id="@+id/te1"/>
+        app:itemIconTint="#000000"
+        app:itemTextColor="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_menu"
+        app:labelVisibilityMode="unlabeled"
+        tools:layout_editor_absoluteX="1dp" />
 
-    <TextView
+    <FrameLayout
+        android:id="@+id/main_frame"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:textSize="20dp"
-        android:textAlignment="center"
-        android:text="실패!"
-        android:id="@+id/te2"/>
+        android:layout_height="676dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavi"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </FrameLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout ! "
-        android:layout_marginLeft="150dp"
-        android:textSize="20dp"
-        android:layout_marginTop="20dp"
-        android:id="@+id/btn1"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="탈퇴 ! "
-        android:layout_marginLeft="170dp"
-        android:textSize="20dp"
-        android:layout_marginTop="40dp"
-        android:id="@+id/btn2"/>
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/me"
-        android:layout_marginTop="30dp"
-        android:hint="당신에게 응원의 말을 해주세요"
-        android:textAlignment="center"
-        android:textSize="20dp"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btn3"
-        android:text="입력하기"
-        android:layout_marginTop="10dp"/>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
