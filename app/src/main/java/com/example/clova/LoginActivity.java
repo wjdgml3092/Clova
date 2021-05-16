@@ -28,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button buttonLogIn;
     private Button buttonSignUp;
 
-    boolean verified;
+    boolean verified = false; //이메일 인증 확인 boolean 변수
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +39,8 @@ public class LoginActivity extends AppCompatActivity {
         firebaseAuth.useAppLanguage(); // 사용자 디바이스 언어에 맞게 이메일 언어 보내기
         FirebaseUser user = firebaseAuth.getCurrentUser(); //현재 사용자 정보
 
+        //Log.d("login-oncreate", firebaseAuth.getCurrentUser().toString());
+
         editTextEmail = (EditText) findViewById(R.id.edittext_email);
         editTextPassword = (EditText) findViewById(R.id.edittext_password);
         buttonLogIn = (Button) findViewById(R.id.btn_login);
@@ -47,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!editTextEmail.getText().toString().equals("") && !editTextPassword.getText().toString().equals("")) {
-                    loginUser(editTextEmail.getText().toString(), editTextPassword.getText().toString(), user);
+                    loginUser(editTextEmail.getText().toString(), editTextPassword.getText().toString(), firebaseAuth);
                     // loginUser 함수 call -> dialog 제어, db에서 유저정보 찾아서 로그인 success
                 } else {
                     Toast.makeText(LoginActivity.this, "계정과 비밀번호를 입력하세요.", Toast.LENGTH_LONG).show();
@@ -55,19 +57,34 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-       firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+        FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
-                if (user != null) { //사용자 정보가 있으면,
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
+                if (firebaseAuth.getCurrentUser() != null){
+                    //Do anything here which needs to be done after user is set is complete
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }
                 else {
-
                 }
             }
         };
+
+    /*   firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                Log.d("login-user-listener", firebaseAuth.toString());
+
+                if (user != null) { //사용자 정보가 있으면,
+                    Log.d("login-user-listener", "not null");
+                 //   Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                 //   startActivity(intent);
+                }
+                else {
+                    Log.d("login-user-listener", "null");
+                }
+            }
+        };*/
+        firebaseAuth.addAuthStateListener(authStateListener);
 
         buttonSignUp = (Button) findViewById(R.id.btn_signup);
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
@@ -81,25 +98,32 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    public void loginUser(String email, String password, FirebaseUser user) {
+    public void loginUser(String email, String password, FirebaseAuth auth) {
 
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d("login-loginuser funtion", email);
+
+                        FirebaseUser loginuser = auth.getCurrentUser();
 
                         if(!task.isSuccessful()){
                             Toast.makeText(LoginActivity.this, "아이디 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
                         }
                         else {   // 로그인 성공
-                            verified = user.isEmailVerified(); //이메일 인증 ok - true, no - false
+                            verified = loginuser.isEmailVerified(); //이메일 인증 ok - true, no - false
+                            Log.d("login-user-veri-in", loginuser.toString());
+
                             if(!verified) { //인증하러가라
-                                Log.d("login-user-veri no", user.toString());
-                                dialog(user);
+                                dialog(loginuser);
+                                Log.d("login-user-veri-no", loginuser.toString());
                             }
                             else { // 이미 인증했다
-                                Log.d("login-user-veri ok", user.toString());
-                                firebaseAuth.addAuthStateListener(firebaseAuthListener);
+                                Log.d("login-user-veri ok", loginuser.toString());
+                               // firebaseAuth.addAuthStateListener(firebaseAuthListener);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
                             }
                         }
                     }
