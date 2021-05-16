@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.clova.diary.DiaryFragment;
@@ -12,6 +13,8 @@ import com.example.clova.home.HomeFragment;
 import com.example.clova.mypage.MyPageFragment;
 import com.example.clova.picture.PictureFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.annotations.NotNull;
 import android.view.MenuItem;
 
@@ -23,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private DiaryFragment frag2;
     private PictureFragment frag3;
     private MyPageFragment frag4;
+
+    private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private FirebaseUser user = firebaseAuth.getCurrentUser(); //현재 유저 받아와서
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
