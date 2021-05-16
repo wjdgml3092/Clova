@@ -28,7 +28,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button buttonLogIn;
     private Button buttonSignUp;
 
-    int email_Check = 0;
+    boolean verified;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,15 +87,20 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // 로그인 성공
-                            if(email_Check != 1)
-                              dialog(user);
-                            if(email_Check == 1)
-                               firebaseAuth.addAuthStateListener(firebaseAuthListener);
-                        } else {
-                            // 로그인 실패
+
+                        if(!task.isSuccessful()){
                             Toast.makeText(LoginActivity.this, "아이디 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                        else {   // 로그인 성공
+                            verified = user.isEmailVerified(); //이메일 인증 ok - true, no - false
+                            if(!verified) { //인증하러가라
+                                Log.d("login-user-veri no", user.toString());
+                                dialog(user);
+                            }
+                            else { // 이미 인증했다
+                                Log.d("login-user-veri ok", user.toString());
+                                firebaseAuth.addAuthStateListener(firebaseAuthListener);
+                            }
                         }
                     }
                 });
@@ -119,7 +125,6 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         });
                 Toast.makeText(LoginActivity.this,"해당 이메일을 확인해주세요.",Toast.LENGTH_SHORT).show();
-                email_Check = 1;
             }
         });
         dlg.setNegativeButton("No", new DialogInterface.OnClickListener() {
