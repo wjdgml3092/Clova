@@ -19,6 +19,7 @@ import com.google.firebase.database.annotations.NotNull;
 
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView; //바텀 네비게이션 뷰
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private FirebaseUser user = firebaseAuth.getCurrentUser(); //현재 유저 받아와서
 
+    private long backBtnTime = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem menuItem) {
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.action_home:
                         setFrag(0);
                         break;
@@ -74,23 +77,24 @@ public class MainActivity extends AppCompatActivity {
     private void setFrag(int n) {
         fm = getSupportFragmentManager();
         ft = fm.beginTransaction();
-        switch (n){
+        switch (n) {
             case 0:
-                ft.replace(R.id.main_frame,frag1);
+                ft.replace(R.id.main_frame, frag1);
                 ft.commit();
                 break;
             case 1:
-                ft.replace(R.id.main_frame,frag2);
+                ft.replace(R.id.main_frame, frag2);
                 ft.commit();
                 break;
             case 2:
-                ft.replace(R.id.main_frame,frag3);
+                ft.replace(R.id.main_frame, frag3);
                 ft.commit();
                 break;
             case 3:
-                ft.replace(R.id.main_frame,frag4);
+                ft.replace(R.id.main_frame, frag4);
                 ft.commit();
                 break;
         }
     }
+
 }
