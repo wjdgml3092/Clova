@@ -8,12 +8,20 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <ImageButton
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:src="@drawable/logo"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/white"
+        android:scaleType="fitCenter"/>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:itemIconTint="#000000"
-        app:itemTextColor="#000000"
+        android:background="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_menu"
         app:labelVisibilityMode="unlabeled"
@@ -23,7 +31,7 @@
         android:id="@+id/main_frame"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavi"
         app:layout_constraintTop_toTopOf="parent">
     </FrameLayout>
