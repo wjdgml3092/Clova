@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
+      /*  FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() != null){
@@ -69,7 +69,9 @@ public class LoginActivity extends AppCompatActivity {
                 else {
                 }
             }
-        };
+        }; */
+
+      //  firebaseAuth.addAuthStateListener(authStateListener);
 
     /*   firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -85,7 +87,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };*/
-        firebaseAuth.addAuthStateListener(authStateListener);
 
         buttonSignUp = (Button) findViewById(R.id.btn_signup);
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
