@@ -291,7 +291,6 @@ public class DiaryWriteFragment extends Fragment {
                         }
                     });
                 }
-
                 ivPreview.setImageBitmap(null);
 
             }
