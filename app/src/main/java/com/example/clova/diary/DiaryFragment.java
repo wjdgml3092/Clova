@@ -149,8 +149,6 @@ public class DiaryFragment extends Fragment {
                         data.add(new DiaryData(date, head,"#" + hash1, "#" + hash2,"#" + hash3));
                         Log.d("diary", "DocumentSnapshot data: " + date + " : " + head + " : " + hash1  + hash2 + hash3);
                         mAdapter.notifyDataSetChanged();
-                        //fill_data(data, date, head, hash1, hash2, hash3);
-
                     } else {
                         Log.d("diary", "No such document");
                     }
@@ -159,9 +157,5 @@ public class DiaryFragment extends Fragment {
                 }
             }
         });
-    }
-
-    void fill_data(ArrayList<DiaryData> data, String date, String head, String hash1, String hash2, String hash3){
-
     }
 }

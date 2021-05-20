@@ -75,7 +75,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 Log.d("login-user-listener", firebaseAuth.toString());
-
                 if (user != null) { //사용자 정보가 있으면,
                     Log.d("login-user-listener", "not null");
                  //   Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -123,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             else { // 이미 인증했다
                                 Log.d("login-user-veri ok", loginuser.toString());
-                               // firebaseAuth.addAuthStateListener(firebaseAuthListener);
+                                // firebaseAuth.addAuthStateListener(firebaseAuthListener);
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                             }
