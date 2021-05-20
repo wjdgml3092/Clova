@@ -221,7 +221,7 @@
 
                 <Button
                     android:id="@+id/bt_choose"
-                    android:layout_width="80dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/btn_shape"
@@ -231,11 +231,21 @@
 
                 <Button
                     android:id="@+id/bt_upload"
-                    android:layout_width="80dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/btn_shape"
                     android:text="Upload"
+                    android:textColor="@color/black"
+                    android:textSize="10dp" />
+
+                <Button
+                    android:id="@+id/bt_delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/btn_shape"
+                    android:text="Delete"
                     android:textColor="@color/black"
                     android:textSize="10dp" />
             </LinearLayout>
