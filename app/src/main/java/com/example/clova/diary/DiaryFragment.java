@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +39,9 @@ import java.util.Map;
  */
 public class DiaryFragment extends Fragment {
 
-    private RecyclerView mVerticalView;
+    SwipeRefreshLayout swipeRefreshLayout; // 추가
+
+    private RecyclerView recyclerView;
     private DiaryAdapter mAdapter;
     // private StaggeredGridLayoutManager mLayoutManager;
     private LinearLayoutManager mLayoutManager;
@@ -46,9 +50,16 @@ public class DiaryFragment extends Fragment {
 
     //글 리스트 데이터베이스 변수 관련
     private FirebaseAuth user_auth;
-    String date, head , hash1 , hash2 , hash3;
+    FirebaseFirestore firebaseFirestore;
+    FirebaseUser user;
+    Map<String, Object> user_count = new HashMap<>();
+
+    String date, head, hash1, hash2, hash3;
     Map<String, Object> list = new HashMap<>();
-    String uid = null;
+
+    String user_id = null;
+    String str_count = null;
+    ArrayList<DiaryData> data;
 
     public DiaryFragment() {
         // Required empty public constructor
@@ -60,50 +71,42 @@ public class DiaryFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState);  }
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_diary, container, false);
 
+
         // RecyclerView binding
-        mVerticalView = (RecyclerView) view.findViewById(R.id.diary_list);
+        recyclerView = (RecyclerView) view.findViewById(R.id.diary_list);
 
         //firebase 정의
-        final FirebaseFirestore user_table = FirebaseFirestore.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
         // init Data
-        ArrayList<DiaryData> data = new ArrayList<>();
+        data = new ArrayList<>();
 
         user_auth = FirebaseAuth.getInstance(); //로그아웃 위해 필요함
 
-        FirebaseUser user = user_auth.getCurrentUser(); //현재 사용자 받아오기
+        user = user_auth.getCurrentUser(); //현재 사용자 받아오기
 
         // user_id 값 얻어오기
         if (user != null) {
-            uid = user.getUid(); // 아이디 넣기
-        }
-        else{
+            user_id = user.getUid(); // 아이디 넣기
+        } else {
             startActivity(new Intent(getActivity(), LoginActivity.class));
         }
 
-        Log.d("diary-call", "call 함");
-        Log.d("diary-user", uid);
-        call_list(uid, user_table, data);
-        Log.d("diary-user", "comeback");
-
-    /*    int i = 0;
-        while (i < 2) {
-            Log.d("diary", "뒤질래?");
-            data.add(new DiaryData(date, head,"#" + hash1, "#" + hash2,"#" + hash3));
-            i++;
-        }*/
 
         // init LayoutManager
         mLayoutManager = new LinearLayoutManager(getContext());
 
         // setLayoutManager
-        mVerticalView.setLayoutManager(mLayoutManager);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemViewCacheSize(10);
 
         // init Adapter
         mAdapter = new DiaryAdapter(getContext(), data);
@@ -112,7 +115,25 @@ public class DiaryFragment extends Fragment {
         mAdapter.setData(data);
 
         // set Adapter
-        mVerticalView.setAdapter(mAdapter);
+        recyclerView.setAdapter(mAdapter);
+
+        swipeRefreshLayout = view.findViewById(R.id.refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //새로고침시 돌아가는 코드
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                DiaryFragment diaryFragment = new DiaryFragment();
+                transaction.replace(R.id.main_frame, diaryFragment);
+                transaction.commit();
+
+                //새로고침 종료
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+        //count값 불러오는 함수, 이 안에서 리스트 불러오는 함수(call_list call 된다)
+        call_count(user_id);
 
         FloatingActionButton fab = view.findViewById(R.id.write);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -129,9 +150,41 @@ public class DiaryFragment extends Fragment {
         return view;
     }
 
-    private void call_list(String user_id, FirebaseFirestore user_table, ArrayList<DiaryData> data) { //리스트 불러오기
+    private void call_count(String user_id) {
+        DocumentReference docRef = firebaseFirestore.collection("User").document(user_id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        user_count = document.getData();
 
-        DocumentReference docRef = user_table.collection("Diary").document(user_id);
+                        str_count = (String) user_count.get("count");
+                        Log.d("diary-count", str_count);
+
+                       // call_list(user_id, data);
+                        int count = Integer.parseInt(str_count);
+                        while(count > 0){
+                            Log.d("diary-for => ", Integer.toString(count));
+                            str_count = Integer.toString(count);
+                            call_list(user_id, data);
+                            count--;
+                        }
+
+                    } else {
+                        Log.d("write", "No such document");
+                    }
+                } else {
+                    Log.d("diary", "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void call_list(String user_id, ArrayList<DiaryData> data) { //리스트 불러오기
+        Log.d("diary-call_list-count", str_count);
+        DocumentReference docRef = firebaseFirestore.collection("Diary").document(user_id).collection(str_count).document(user_id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -141,14 +194,17 @@ public class DiaryFragment extends Fragment {
                         list = document.getData();
 
                         MAX_ITEM_COUNT = list.size();
-                        date = (String)list.get("story_date");
-                        head = (String)list.get("story_headline");
-                        hash1 = (String)list.get("story_hashtag1");
-                        hash2 = (String)list.get("story_hashtag2");
-                        hash3 = (String)list.get("story_hashtag3");
-                        data.add(new DiaryData(date, head,"#" + hash1, "#" + hash2,"#" + hash3));
-                        Log.d("diary", "DocumentSnapshot data: " + date + " : " + head + " : " + hash1  + hash2 + hash3);
-                        mAdapter.notifyDataSetChanged();
+                        date = (String) list.get("date");
+                        head = (String) list.get("title");
+                        hash1 = (String) list.get("hashtag1");
+                        hash2 = (String) list.get("hashtag2");
+                        hash3 = (String) list.get("hashtag3");
+
+                        data.add(new DiaryData(date, head, hash1, hash2, hash3));
+                        Log.d("diary", "DocumentSnapshot data: " + date + " : " + head + " : " + hash1 + hash2 + hash3);
+
+                        mAdapter.notifyItemChanged (mAdapter.getItemCount() -1 ,"click");
+
                     } else {
                         Log.d("diary", "No such document");
                     }

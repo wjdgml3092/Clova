@@ -24,6 +24,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -36,8 +38,10 @@ public class MyPageFragment extends Fragment {
     Button bnt_logout, btn_memberdelete, btn_mess;
     String user_id = null;
     private FirebaseAuth user_auth;
+    FirebaseFirestore firebaseFirestore;
+    Map<String , Object> user_count = new HashMap<>();
+    String str_count = null;
 
-    Button btn;
     public MyPageFragment() {
         // Required empty public constructor
     }
@@ -59,7 +63,6 @@ public class MyPageFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_my_page, container, false);
 
-        btn = view.findViewById(R.id.btn);
         tex1 = view.findViewById(R.id.te1);
         tex2= view.findViewById(R.id.te2);
         bnt_logout = view.findViewById(R.id.btn1);
@@ -72,7 +75,7 @@ public class MyPageFragment extends Fragment {
         FirebaseUser user = user_auth.getCurrentUser(); //현재 사용자 받아오기
 
         //firebase 정의
-        final FirebaseFirestore user_table = FirebaseFirestore.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
        if (user != null) {
             String name = user.getDisplayName();
@@ -111,7 +114,7 @@ public class MyPageFragment extends Fragment {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(getActivity(), "계정이 삭제 되었습니다.", Toast.LENGTH_LONG).show();
-                                    filed_Delete(user_table, user_id);
+                                    filed_Delete(user_id);
                                     Log.d("delete-member", "성공");
                                     startActivity(new Intent(getActivity(), LoginActivity.class));
                                     getActivity().finish();
@@ -124,6 +127,8 @@ public class MyPageFragment extends Fragment {
             }
         });
 
+        call_count(user_id); // count 값 가져오기
+
         btn_mess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,8 +136,9 @@ public class MyPageFragment extends Fragment {
 
                 Map<String, Object> user_info = new HashMap<>();
                 user_info.put("message", message);
+                user_info.put("count", str_count);
 
-                user_table.collection("User").document(user_id)
+                firebaseFirestore.collection("User").document(user_id)
                         .set(user_info)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -150,31 +156,36 @@ public class MyPageFragment extends Fragment {
             }
         });
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //fragment <-> fragment 교체 코드
-                //transaction변수를 만들고 현재 액티비티에 프레그먼트매니저를 가져와서
-                //beginTransaction호출해서 트랜잭션을 생성해서
-                //바꿀 프래그먼트 객체 생성해주기
-                //replace로 교체해주기
-                //변경 준비 완료 후 commit~!
-                //main_frame -> 나타낼 부분 id값 => activity_main.xml framelayout id 값
-
-                /*FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fack fragment1 = new fack();
-                transaction.replace(R.id.main_frame, fragment1);
-                transaction.commit();*/
-            }
-        });
 
         return view;
     }
-    void filed_Delete(FirebaseFirestore user_table, String user_id){
+
+    void call_count(String user_id){
+        DocumentReference docRef = firebaseFirestore.collection("User").document(user_id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        user_count = document.getData();
+
+                        str_count = (String)user_count.get("count");
+                        Log.d("mypage-count", str_count);
+                    } else {
+                        Log.d("write", "No such document");
+                    }
+                } else {
+                    Log.w("diary", "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    void filed_Delete(String user_id){
         //    DocumentReference docRef = user_table.collection("User").document(user_id);
 
-        user_table.collection("User").document(user_id)
+        firebaseFirestore.collection("User").document(user_id)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

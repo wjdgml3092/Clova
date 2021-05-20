@@ -18,11 +18,34 @@
         app:srcCompat="@android:drawable/ic_input_add"
         android:contentDescription="addDiary" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/diary_list"
+    <TextView
+        android:id="@+id/warn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="17dp"
+        android:textColor="#FF0000"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="10dp"
+        android:gravity="center"
+        android:text="글 작성 후 새로고침을 해주세요!😁"
+        />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:layout_marginTop="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/warn"
+        app:layout_constraintLeft_toLeftOf="@+id/warn"
+        android:id="@+id/refresh_layout">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/diary_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
 
