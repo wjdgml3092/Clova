@@ -14,10 +14,16 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -29,6 +35,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button buttonSignUp;
 
     boolean verified = false; //이메일 인증 확인 boolean 변수
+
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +155,8 @@ public class LoginActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     Log.d("login-email veri", "Email sent.");
+                                    String user_id = user.getUid();
+                                    settingMessage(user_id, firebaseFirestore);
                                 }
                             }
                         });
@@ -163,6 +173,29 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         dlg.show();
+    }
+
+    void settingMessage(String user_id, FirebaseFirestore firebaseFirestore){
+
+        Map<String, Object> user_me = new HashMap<>();
+        user_me.put("message", "오늘 하루도 고생하셨습니다.");
+        user_me.put("count", "0");
+
+        Log.d("login-user_id = ", user_id);
+        firebaseFirestore.collection("User").document(user_id)
+                .set(user_me)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("login-mess settings ", "성공");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("loginmess settings-no ", "Error writing document", e);
+                    }
+                });
     }
 
     @Override
