@@ -17,6 +17,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.w3c.dom.Text;
+
 import java.util.regex.Pattern;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -50,7 +52,7 @@ public class SignUpActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!editTextEmail.getText().toString().equals("") && !editTextPassword.getText().toString().equals("")) {
                     // 이메일과 비밀번호가 공백이 아닌 경우
-                    createUser(editTextEmail.getText().toString(), editTextPassword.getText().toString(), password);
+                    createUser(editTextEmail.getText().toString(), editTextPassword.getText().toString(), password, email);
                 } else {
                     // 이메일과 비밀번호가 공백인 경우
                     Toast.makeText(SignUpActivity.this, "계정과 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show();
@@ -60,7 +62,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    private void createUser(String email, String password, TextView check_pwd) {
+    private void createUser(String email, String password, TextView check_pwd, TextView check_email) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -75,6 +77,7 @@ public class SignUpActivity extends AppCompatActivity {
                             // 계정이 중복된 경우
                             if(!isValidPasswd())
                                 check_pwd.setText("비밀번호는 4-16자와 특수문자를 포함해야합니다.");
+                            check_email.setText("이메일이 이미 가입되어있습니다. 다른 이메일을 사용해주세요");
                             // Toast.makeText(SignUpActivity.this, "비밀번호 형식에 알맞지 않습니다. 6자리 이상 입력해주세요.", Toast.LENGTH_SHORT).show();
                         }
                     }
