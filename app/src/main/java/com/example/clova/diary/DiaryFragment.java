@@ -46,8 +46,6 @@ public class DiaryFragment extends Fragment {
     // private StaggeredGridLayoutManager mLayoutManager;
     private LinearLayoutManager mLayoutManager;
 
-    private int MAX_ITEM_COUNT = 0; // 개수 제한
-
     //글 리스트 데이터베이스 변수 관련
     private FirebaseAuth user_auth;
     FirebaseFirestore firebaseFirestore;
@@ -100,7 +98,6 @@ public class DiaryFragment extends Fragment {
             startActivity(new Intent(getActivity(), LoginActivity.class));
         }
 
-
         // init LayoutManager
         mLayoutManager = new LinearLayoutManager(getContext());
 
@@ -122,6 +119,7 @@ public class DiaryFragment extends Fragment {
             @Override
             public void onRefresh() {
                 //새로고침시 돌아가는 코드
+
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 DiaryFragment diaryFragment = new DiaryFragment();
                 transaction.replace(R.id.main_frame, diaryFragment);
@@ -146,7 +144,6 @@ public class DiaryFragment extends Fragment {
             }
         });
 
-
         return view;
     }
 
@@ -163,14 +160,16 @@ public class DiaryFragment extends Fragment {
                         str_count = (String) user_count.get("count");
                         Log.d("diary-count", str_count);
 
-                       // call_list(user_id, data);
+                        call_list(user_id, data);
+
+                   /*     // call_list(user_id, data);
                         int count = Integer.parseInt(str_count);
                         while(count > 0){
                             Log.d("diary-for => ", Integer.toString(count));
                             str_count = Integer.toString(count);
                             call_list(user_id, data);
                             count--;
-                        }
+                        } */
 
                     } else {
                         Log.d("write", "No such document");
@@ -182,9 +181,16 @@ public class DiaryFragment extends Fragment {
         });
     }
 
-    private void call_list(String user_id, ArrayList<DiaryData> data) { //리스트 불러오기
+    private boolean call_list(String user_id, ArrayList<DiaryData> data) { //리스트 불러오기
         Log.d("diary-call_list-count", str_count);
-        DocumentReference docRef = firebaseFirestore.collection("Diary").document(user_id).collection(str_count).document(user_id);
+
+        if(str_count.equals("0")) { // 종료 조건
+            return false;
+        }
+        DocumentReference docRef = firebaseFirestore.collection("Diary").document(user_id)
+                .collection(str_count).document(user_id);
+        Log.d("diary-inner cnt", str_count);
+
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -193,7 +199,6 @@ public class DiaryFragment extends Fragment {
                     if (document.exists()) {
                         list = document.getData();
 
-                        MAX_ITEM_COUNT = list.size();
                         date = (String) list.get("date");
                         head = (String) list.get("title");
                         hash1 = (String) list.get("hashtag1");
@@ -203,7 +208,17 @@ public class DiaryFragment extends Fragment {
                         data.add(new DiaryData(date, head, hash1, hash2, hash3));
                         Log.d("diary", "DocumentSnapshot data: " + date + " : " + head + " : " + hash1 + hash2 + hash3);
 
+                        //mAdapter.notifyDataSetChanged();
                         mAdapter.notifyItemChanged (mAdapter.getItemCount() -1 ,"click");
+
+                        //아래 주석 풀고 실행 위 주석 지우기
+                        int count = Integer.parseInt(str_count);
+                        /*if(count == 1){
+                            mAdapter.notifyItemChanged (mAdapter.getItemCount() -1 ,"click");
+                        }*/
+                        count--;
+                        str_count = Integer.toString(count);
+                        call_list(user_id, data);
 
                     } else {
                         Log.d("diary", "No such document");
@@ -213,5 +228,6 @@ public class DiaryFragment extends Fragment {
                 }
             }
         });
+        return  true;
     }
 }

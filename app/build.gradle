@@ -53,4 +53,8 @@ dependencies {
 
     //sdk 버전 때문
     implementation 'com.android.support:multidex:1.0.3'
+
+    //Glide -> look에서 이미지 때문
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 }

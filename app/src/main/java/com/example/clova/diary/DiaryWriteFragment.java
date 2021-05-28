@@ -81,6 +81,8 @@ public class DiaryWriteFragment extends Fragment {
     String hash3check = null;
     String urlcheck = null;
 
+    String filename; // 파일명
+
     //파이어베이스 변수
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
@@ -152,7 +154,18 @@ public class DiaryWriteFragment extends Fragment {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int day) {
                                 month = month + 1;
-                                chooseDate = year + "/" + month + "/" + day;
+                                if(day < 10 && month <10) {
+                                    chooseDate = year + "/0" + month + "/0" + day;
+                                }
+                                else if (day < 10){
+                                    chooseDate = year + "/" + month + "/0" + day;
+                                }
+                                else if(month < 10){
+                                    chooseDate = year + "/0" + month + "/" + day;
+                                }
+                                else{
+                                    chooseDate = year + "/" + month + "/" + day;
+                                }
                                 date.setText(chooseDate);
                             }
                         }, year, month, day);
@@ -227,7 +240,7 @@ public class DiaryWriteFragment extends Fragment {
                 else
                     urlcheck = storageRef.toString();
 
-                if (titlecheck == null || chooseDate == null || str_content == null || feelcheck == null) {
+                if (titlecheck.equals("")  || chooseDate.equals("")  ||  str_content.equals("") || feelcheck.equals("") ) {
                     Toast.makeText(getActivity().getBaseContext(), "날짜, 제목, 감정 그리고 내용은 필수 입력입니다.", Toast.LENGTH_LONG).show();
                 }
                 else if (filePath != null && storageRef == null) {
@@ -349,7 +362,8 @@ public class DiaryWriteFragment extends Fragment {
         diary_cotent.put("hashtag1", hash1check);
         diary_cotent.put("hashtag2", hash2check);
         diary_cotent.put("hashtag3", hash3check);
-        diary_cotent.put("img", urlcheck);
+        //diary_cotent.put("img", urlcheck);
+        diary_cotent.put("img", filename);
         diary_cotent.put("content", str_content);
 
         Log.d("diary-write hash", hash1check + " " + hash2check + " " + hash3check);
@@ -370,7 +384,6 @@ public class DiaryWriteFragment extends Fragment {
                         Log.w("diary-write", "Error writing document", e);
                     }
                 });
-
     }
 
     void setcount(String user_id) {
@@ -463,7 +476,7 @@ public class DiaryWriteFragment extends Fragment {
             //Unique한 파일명을 만들자.
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMHH_mmss");
             Date now = new Date();
-            String filename = formatter.format(now) + ".png";
+            filename = formatter.format(now) + ".png";
             //storage 주소와 폴더 파일명을 지정해 준다.
             storageRef = storage.getReferenceFromUrl("gs://clova-102e8.appspot.com").child("images/" + filename);
             //올라가거라...
