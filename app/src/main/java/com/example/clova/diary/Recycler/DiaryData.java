@@ -1,15 +1,25 @@
 package com.example.clova.diary.Recycler;
 
-public class DiaryData {
+public class DiaryData implements Comparable<DiaryData>{
 
-    private String date, title, word1, word2, word3;
+    private String date, title, word1, word2, word3, cnt;
 
-    public DiaryData(String date, String title, String word1, String word2, String word3){
+    public DiaryData(String date, String title, String word1, String word2, String word3) {
         this.date = date;
         this.title = title;
         this.word1 = word1;
         this.word2 = word2;
         this.word3 = word3;
+       // this.cnt = cnt;
+    }
+
+    @Override
+    public int compareTo(DiaryData input_date) {
+        return this.date.compareTo(input_date.date);
+    }
+
+    public int compareTo_date(DiaryData input_date) {
+        return this.date.compareTo(input_date.date);
     }
 
     public String getDate() {
@@ -51,6 +61,8 @@ public class DiaryData {
     public void setWord3(String word3) {
         this.word3 = word3;
     }
+
+
 }
 
 

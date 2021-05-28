@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,10 +48,6 @@ public class DiaryViewFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_diary_view, container, false);
     }
-
-
-
-
 }
 
 class DiaryViewHolder extends RecyclerView.ViewHolder {
@@ -73,10 +70,18 @@ class DiaryViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 int pos = getAdapterPosition();
+
                 if (pos != RecyclerView.NO_POSITION) {
+                    Log.d("diartview pos", Integer.toString(pos));
                     FragmentTransaction transaction =
                             ((AppCompatActivity) mContext).getSupportFragmentManager().beginTransaction();
                     DiaryLookFragment fragment1 = new DiaryLookFragment();
+                    
+                    //프래그먼트 값 전달
+                    Bundle bundle = new Bundle();
+                    bundle.putString("count", Integer.toString(pos));
+                    fragment1.setArguments(bundle);
+                    
                     transaction.replace(R.id.main_frame, fragment1);
                     transaction.addToBackStack(null);
                     transaction.commit();
