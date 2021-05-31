@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -14,12 +15,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.clova.LoginActivity;
 import com.example.clova.R;
 import com.example.clova.diary.Recycler.DiaryAdapter;
 import com.example.clova.diary.Recycler.DiaryData;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,7 +81,6 @@ public class DiaryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_diary, container, false);
-
 
         // RecyclerView binding
         recyclerView = (RecyclerView) view.findViewById(R.id.diary_list);
@@ -158,18 +161,10 @@ public class DiaryFragment extends Fragment {
                         user_count = document.getData();
 
                         str_count = (String) user_count.get("count");
+
                         Log.d("diary-count", str_count);
 
                         call_list(user_id, data);
-
-                   /*     // call_list(user_id, data);
-                        int count = Integer.parseInt(str_count);
-                        while(count > 0){
-                            Log.d("diary-for => ", Integer.toString(count));
-                            str_count = Integer.toString(count);
-                            call_list(user_id, data);
-                            count--;
-                        } */
 
                     } else {
                         Log.d("write", "No such document");
@@ -184,9 +179,10 @@ public class DiaryFragment extends Fragment {
     private boolean call_list(String user_id, ArrayList<DiaryData> data) { //리스트 불러오기
         Log.d("diary-call_list-count", str_count);
 
-        if(str_count.equals("0")) { // 종료 조건
+        if(str_count.equals("-1")) { // 종료 조건
             return false;
         }
+
         DocumentReference docRef = firebaseFirestore.collection("Diary").document(user_id)
                 .collection(str_count).document(user_id);
         Log.d("diary-inner cnt", str_count);
@@ -205,7 +201,7 @@ public class DiaryFragment extends Fragment {
                         hash2 = (String) list.get("hashtag2");
                         hash3 = (String) list.get("hashtag3");
 
-                        data.add(new DiaryData(date, head, hash1, hash2, hash3));
+                        data.add(new DiaryData(date, head, "#" + hash1, "#"+ hash2, "#" + hash3));
                         Log.d("diary", "DocumentSnapshot data: " + date + " : " + head + " : " + hash1 + hash2 + hash3);
 
                         //mAdapter.notifyDataSetChanged();
