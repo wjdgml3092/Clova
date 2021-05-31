@@ -177,7 +177,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Map<String, Object> user_me = new HashMap<>();
         user_me.put("message", "오늘 하루도 고생하셨습니다.");
-        user_me.put("count", "-1");
+        user_me.put("count", "0");
 
         Log.d("login-user_id = ", user_id);
         firebaseFirestore.collection("User").document(user_id)
