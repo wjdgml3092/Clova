@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
@@ -27,6 +28,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.clova.LoginActivity;
 import com.example.clova.MainActivity;
 import com.example.clova.R;
+import com.example.clova.diary.Recycler.DiaryAdapter;
 import com.example.clova.diary.Recycler.DiaryData;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,7 +40,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,8 +55,8 @@ import static android.app.Activity.RESULT_OK;
 
 public class DiaryLookFragment extends Fragment {
 
-    TextView date, title, feel, hashtag1, hashtag2, hashtag3, content;
-    Button update_btn, delete_btn;
+    TextView date, title, feel, hashtag1, hashtag2, hashtag3, content, img_des;
+    Button update_btn;
     ImageView img;
 
     String str_date, str_title, str_feel, str_hash1, str_hash2, str_hash3, str_img, str_content;
@@ -71,6 +75,8 @@ public class DiaryLookFragment extends Fragment {
     Map<String, Object> user_count = new HashMap<>(); // call_count 사용
     Map<String, Object> list = new HashMap<>(); // callLookList에서 사용
     ArrayList<DiaryData> data = new ArrayList<>();
+
+   // ArrayList<DiaryData> data;
 
     public DiaryLookFragment() {
         // Required empty public constructor
@@ -116,7 +122,22 @@ public class DiaryLookFragment extends Fragment {
         // 현재 user에 count 값 받아오기 + 현재 count랑 - 받아온 count
         call_count(user_id);
 
-        // 그 계산된 count로 Diary 컬렉션에서 읽어와서 set해주기
+        update_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                DiaryUpdateFragment diaryUpdateFragment = new DiaryUpdateFragment();
+
+                //프래그먼트 값 전달
+                Bundle bundle = new Bundle();
+                bundle.putString("count", result_cnt);
+                diaryUpdateFragment.setArguments(bundle);
+
+                fragmentTransaction.replace(R.id.main_frame, diaryUpdateFragment);
+                fragmentTransaction.commit();
+            }
+        });
+
         return view;
     }
 
@@ -130,7 +151,7 @@ public class DiaryLookFragment extends Fragment {
         img = view.findViewById(R.id.img);
         content = view.findViewById(R.id.content);
         update_btn = view.findViewById(R.id.update_btn);
-        delete_btn = view.findViewById(R.id.delete_btn);
+        img_des = view.findViewById(R.id.img_des);
     }
 
     private void call_count(String user_id) {
@@ -152,7 +173,7 @@ public class DiaryLookFragment extends Fragment {
                         result_cnt = Integer.toString(num_cucnt - num_cnt);
                         Log.d("diary_look-계산", result_cnt);
 
-                        callLookList(user_id, data);
+                        callLookList(user_id, data); // 계산된 count로 Diary 컬렉션에서 읽어와서 set해주기
 
                     } else {
                         Log.d("write", "No such document");
@@ -191,34 +212,24 @@ public class DiaryLookFragment extends Fragment {
                         date.setText(str_date);
                         title.setText(str_title);
                         feel.setText(str_feel);
-                        if (str_hash1 != "") {
-                            hashtag1.setVisibility(View.VISIBLE);
-                            hashtag1.setText(str_hash1);
-                        }
-                        if (str_hash2 != "") {
-                            hashtag2.setVisibility(View.VISIBLE);
-                            hashtag2.setText(str_hash2);
-                        }
-                        if (str_hash3 != "") {
-                            hashtag3.setVisibility(View.VISIBLE);
-                            hashtag3.setText(str_hash3);
-                        }
+                        hashtag1.setText("#" + str_hash1);
+                        hashtag2.setText("#" + str_hash2);
+                        hashtag3.setText("#" + str_hash3);
+
                         if (!str_img.equals("")) {
-                            Log.d("diary-look img file", str_img);
+                            img.setImageResource(R.drawable.loading);
+                            img_des.setVisibility(View.VISIBLE);
 
-                            Uri uri = Uri.parse(str_img);
-
-                            //1.Firebase Storage관리 객체 얻어오기
+                            //Firebase Storage관리 객체 얻어오기
                             FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
 
-                            //2. 최상위노드 참조객체 얻어오기
+                            //최상위노드 참조객체 얻어오기
                             StorageReference rootRef = firebaseStorage.getReference();
 
                             //읽어오길 원하는 파일의 참조객체 얻어오기
                             StorageReference imgRef = rootRef.child("images/" + str_img); //파일 이름을 가져오는 중
                             //하위 폴더가 있다면 폴더명까지 포함하여
                             //imgRef = rootRef.child("photo/bikewheel.png");
-
                             if (imgRef != null) {
                                 //참조객체로부터 이미지의 다운로드 URL을 얻어오기.
                                 imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() { ////Task로 리턴, 이 자체가 객체이기에 바로 . 하고 사용가능
@@ -227,9 +238,13 @@ public class DiaryLookFragment extends Fragment {
                                         Log.d("diary-look", "성공");
                                         //다운로드 URL이 파라미터로 전달되어 옴.
                                         Glide.with(content.getContext()).load(uri).into(img);
+                                        img_des.setText("Loading success!");
                                     }
                                 });
                             }
+                        }
+                        else{
+                            img.setVisibility(View.INVISIBLE);
                         }
 
                     content.setText(str_content);
@@ -237,13 +252,11 @@ public class DiaryLookFragment extends Fragment {
                 } else {
                     Log.d("diary", "No such document");
                 }
-            } else
-
-            {
+            } else {
                 Log.d("diary", "get failed with ", task.getException());
             }
-        }
-    });
-}
+         }
+        });
+    }
 
 }

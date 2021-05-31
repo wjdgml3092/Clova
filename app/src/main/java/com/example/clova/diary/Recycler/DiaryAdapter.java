@@ -46,9 +46,25 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryViewHolder> {
 
         holder.date.setText(data.getDate());
         holder.title.setText(data.getTitle());
-        holder.word1.setText(data.getWord1());
-        holder.word2.setText(data.getWord2());
-        holder.word3.setText(data.getWord3());
+
+        if(data.getWord1().length() == 1) // #만 있을 때
+            holder.word1.setText("");
+        else
+            holder.word1.setText(data.getWord1());
+
+        if(data.getWord2().length() == 1) // #만 있을 때
+            holder.word2.setText("");
+        else
+            holder.word2.setText(data.getWord2());
+
+        if(data.getWord3().length() == 1) // #만 있을 때
+            holder.word3.setText("");
+        else
+            holder.word3.setText(data.getWord3());
+
+        //holder.word1.setText(data.getWord1());
+        //holder.word2.setText(data.getWord2());
+        //holder.word3.setText(data.getWord3());
     }
 
     @Override

@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,8 +29,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.clova.LoginActivity;
 import com.example.clova.R;
+import com.example.clova.diary.Recycler.DiaryData;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -58,7 +59,9 @@ import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
-public class DiaryWriteFragment extends Fragment {
+public class DiaryUpdateFragment extends Fragment {
+
+    String count; // look에서 받아온 count
 
     EditText content, title, hashtag1, hashtag2, hashtag3;
     TextView date;
@@ -67,12 +70,14 @@ public class DiaryWriteFragment extends Fragment {
     RadioGroup radioGroup;
     RadioButton radio1, radio2, radio3, radio4;
 
-    private Uri filePath = null;
+    //db 불러올 때 사용
+    String read_date, read_title, read_feel, read_hash1, read_hash2, read_hash3, read_img, read_content;
 
-    String message = null;
+    Map<String, Object> list = new HashMap<>(); // diary_setting에서 사용
+    ArrayList<DiaryData> data = new ArrayList<>();
+
+    //db 저장 시 사용
     String str_content; // 입력 텍스트 string으로
-    String user_id; // user_id string
-    int count; // user테이블에 count 얻어오는변수
     String feelcheck = ""; // 감정 레이오 스트링
     String chooseDate = ""; // 날짜 데이터 스트링
     String titlecheck = "";
@@ -80,26 +85,28 @@ public class DiaryWriteFragment extends Fragment {
     String hash2check = "";
     String hash3check = "";
     String urlcheck = "";
-
     String filename = ""; // 파일명
+
+    View view;
+
+    //이미지 uri
+    private Uri filePath = null;
+    StorageReference storageRef; // 파이어스토리지 url 담는 객체
 
     //파이어베이스 변수
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
     FirebaseFirestore firebaseFirestore;
-    Map<String, Object> user_count = new HashMap<>();
+    Map<String, Object> diary = new HashMap<>();
+    String user_id; // user_id string
 
-    StorageReference storageRef; // 파이어스토리지 url 담는 객체
-
-    View view;
-
-    public DiaryWriteFragment() {
+    public DiaryUpdateFragment() {
         // Required empty public constructor
     }
-
-    public static DiaryWriteFragment newInstance() {
-        DiaryWriteFragment fragment = new DiaryWriteFragment();
-        return fragment;
+    // TODO: Rename and change types and number of parameters
+    public static DiaryUpdateFragment newInstance() {
+        DiaryUpdateFragment diaryUpdateFragment = new DiaryUpdateFragment();
+        return diaryUpdateFragment;
     }
 
     @Override
@@ -110,9 +117,16 @@ public class DiaryWriteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_diary_write, container, false);
+        view = inflater.inflate(R.layout.fragment_diary_update, container, false);
 
+        //id init
         id_init(view); //findViewById() 초기화
+
+        Bundle bundle = getArguments();  //번들 받기. getArguments() 메소드로 받음.
+        if (bundle != null) {
+            count = bundle.getString("count"); //count 받기
+            Log.d("diary-update : ", count); //확인
+        }
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -124,6 +138,9 @@ public class DiaryWriteFragment extends Fragment {
         } else {
             startActivity(new Intent(getActivity(), LoginActivity.class));
         }
+
+        //db diary 읽어와서 setting
+        diary_setting(user_id, data);
 
         Calendar calendar = Calendar.getInstance();
 
@@ -183,31 +200,7 @@ public class DiaryWriteFragment extends Fragment {
             public void onClick(View v) {
                 //제목
                 titlecheck = title.getText().toString();
-
-                //해시태그
-                //널체크 해주기
-                hash1check = hashtag1.getText().toString();
-                Log.d("diary-write hash1", hash1check);
-                /* if(hash1check.length() != 0)
-                    hash1check = "#" + hash1check;
-                else
-                    hash1check = ""; */
-
-                hash2check = hashtag2.getText().toString();
-                /*Log.d("diary-write hash2", hash2check);
-
-                if(hash2check.length() != 0) {
-                    hash2check = "#" + hash2check;
-                }
-                else
-                    hash2check = ""; */
-
-                hash3check = hashtag3.getText().toString();
-               /* Log.d("diary-write hash3", hash3check);
-                if(hash3check.length() != 0)
-                    hash3check = "#" + hash3check;
-                else
-                    hash3check = ""; */
+                Log.d("diary_update", titlecheck);
 
                 //내용
                 str_content = content.getText().toString();
@@ -222,11 +215,11 @@ public class DiaryWriteFragment extends Fragment {
                     Toast.makeText(getActivity().getBaseContext(), "날짜, 제목, 감정 그리고 내용은 필수 입력입니다.", Toast.LENGTH_LONG).show();
                 }
                 else if (filePath != null && storageRef == null) {
-                        dialog();
+                    dialog();
                 }
                 else {
-                    //User에서 Count 부르는 함수 call
-                    call_count(user_id);
+                    //디비 내용 저장 함수 call
+                    diary_save(user_id);
                     Log.d("write", "DocumentSnapshot data: " + count);
 
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -322,27 +315,78 @@ public class DiaryWriteFragment extends Fragment {
         btn_delete = view.findViewById(R.id.bt_delete);
     }
 
-    private void call_count(String user_id) {
-        DocumentReference docRef = firebaseFirestore.collection("User").document(user_id);
+    private void diary_setting(String user_id, ArrayList<DiaryData> data) { //리스트 불러오기
+        Log.d("diary-call_list-count", count);
+
+        DocumentReference docRef = firebaseFirestore.collection("Diary").document(user_id)
+                .collection(count).document(user_id);
+        Log.d("diary-inner cnt", count);
+
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        user_count = document.getData();
+                        list = document.getData();
 
-                        String str_count = (String) user_count.get("count");
-                        message = (String) user_count.get("message");
-                        count = Integer.parseInt(str_count) + 1;
-                        Log.d("write-callcount", Integer.toString(count));
+                        read_date = (String) list.get("date");
+                        read_title = (String) list.get("title");
+                        read_feel = (String) list.get("feel");
+                        read_hash1 = (String) list.get("hashtag1");
+                        read_hash2 = (String) list.get("hashtag2");
+                        read_hash3 = (String) list.get("hashtag3");
+                        read_img = (String) list.get("img");
+                        str_content = (String) list.get("content");
 
-                        setcount(user_id);
+                        date.setText(read_date);
+                        chooseDate = read_date; // 날짜 choosedate로 통일
 
-                        //디비 내용 저장 함수 call
-                        diary_save(user_id);
+                        title.setText(read_title);
+
+                        //라디오 버튼 선택
+                        if(read_feel.equals("행복"))
+                            radioGroup.check(R.id.rg_btn1);
+                        else if(read_feel.equals("웃김"))
+                            radioGroup.check(R.id.rg_btn2);
+                        else if(read_feel.equals("슬픔"))
+                            radioGroup.check(R.id.rg_btn3);
+                        else if(read_feel.equals("화남"))
+                            radioGroup.check(R.id.rg_btn4);
+                        feelcheck = read_feel;
+
+                        hashtag1.setText(read_hash1);
+                        hashtag2.setText(read_hash2);
+                        hashtag3.setText(read_hash3);
+
+                        if (!read_img.equals("")) {
+                            filePath = Uri.parse(read_img);
+                            //Firebase Storage관리 객체 얻어오기
+                            FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+
+                            //최상위노드 참조객체 얻어오기
+                            StorageReference rootRef = firebaseStorage.getReference();
+
+                            //읽어오길 원하는 파일의 참조객체 얻어오기
+                            StorageReference imgRef = rootRef.child("images/" + read_img); //파일 이름을 가져오는 중
+                            //하위 폴더가 있다면 폴더명까지 포함하여
+                            //imgRef = rootRef.child("photo/bikewheel.png");
+
+                            if (imgRef != null) {
+                                //참조객체로부터 이미지의 다운로드 URL을 얻어오기.
+                                imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() { ////Task로 리턴, 이 자체가 객체이기에 바로 . 하고 사용가능
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        //다운로드 URL이 파라미터로 전달되어 옴.
+                                        Glide.with(content.getContext()).load(uri).into(ivPreview);
+                                    }
+                                });
+                            }
+                        }
+                        content.setText(str_content);
+
                     } else {
-                        Log.d("write", "No such document");
+                        Log.d("diary", "No such document");
                     }
                 } else {
                     Log.d("diary", "get failed with ", task.getException());
@@ -354,9 +398,15 @@ public class DiaryWriteFragment extends Fragment {
     private void diary_save(String user_id) {
         // Create a new user with a first and last name
         Map<String, Object> diary_cotent = new HashMap<>();
+
         diary_cotent.put("date", chooseDate);
         diary_cotent.put("title", titlecheck);
         diary_cotent.put("feel", feelcheck);
+
+        hash1check = hashtag1.getText().toString();
+        hash2check = hashtag2.getText().toString();
+        hash3check = hashtag3.getText().toString();
+
         diary_cotent.put("hashtag1", hash1check);
         diary_cotent.put("hashtag2", hash2check);
         diary_cotent.put("hashtag3", hash3check);
@@ -365,10 +415,10 @@ public class DiaryWriteFragment extends Fragment {
         diary_cotent.put("content", str_content);
 
         Log.d("diary-write hash", hash1check + " " + hash2check + " " + hash3check);
-        Log.d("write-diarycount", Integer.toString(count));
+        Log.d("write-diarycount", count);
 
         firebaseFirestore.collection("Diary").document(user_id)
-                .collection(Integer.toString(count)).document(user_id)
+                .collection(count).document(user_id)
                 .set(diary_cotent)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -380,30 +430,6 @@ public class DiaryWriteFragment extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w("diary-write", "Error writing document", e);
-                    }
-                });
-    }
-
-    void setcount(String user_id) {
-        String setcnt = Integer.toString(count);
-
-        Map<String, Object> cnt = new HashMap<>();
-        cnt.put("count", setcnt);
-        cnt.put("message", message);
-
-        Log.d("write-setcount", setcnt);
-        firebaseFirestore.collection("User").document(user_id)
-                .set(cnt)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("User", "count setting finish!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("User", "Error writing document", e);
                     }
                 });
     }

@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-      /*  FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
+    /*    FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() != null){
@@ -77,9 +77,7 @@ public class LoginActivity extends AppCompatActivity {
                 else {
                 }
             }
-        }; */
-
-      //  firebaseAuth.addAuthStateListener(authStateListener);
+        };
 
     /*   firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -179,7 +177,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Map<String, Object> user_me = new HashMap<>();
         user_me.put("message", "오늘 하루도 고생하셨습니다.");
-        user_me.put("count", "0");
+        user_me.put("count", "-1");
 
         Log.d("login-user_id = ", user_id);
         firebaseFirestore.collection("User").document(user_id)
@@ -200,7 +198,34 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() { //자동로그인
+        // logic : 현재 유저가 있으면, 이메일 인증을 확인한다.
+        // 이유 : 탈퇴를 진행해도 유저가 있다고 기억하는 경우가 있기 때문.
+        // 이렇게 하면, 회원가입 후 로그인으로 돌아오면 바로 이메일인증 대화상자 생김
+
         super.onStart();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        if (user != null){
+            verified = user.isEmailVerified(); //이메일 인증 ok - true, no - false
+            Log.d("login-user-veri-in", user.toString());
+
+            if(!verified) { //인증하러가라
+                dialog(user);
+                Log.d("login-user-veri-no", user.toString());
+            }
+            else { // 이미 인증했다
+                Log.d("login-user-veri ok", user.toString());
+                // firebaseAuth.addAuthStateListener(firebaseAuthListener);
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+            //Do anything here which needs to be done after user is set is complete
+            //startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            //finish();
+        }
+        else {
+        }
+       // firebaseAuth.addAuthStateListener(authStateListener);
     }
 
     @Override
