@@ -179,7 +179,7 @@ public class DiaryFragment extends Fragment {
     private boolean call_list(String user_id, ArrayList<DiaryData> data) { //리스트 불러오기
         Log.d("diary-call_list-count", str_count);
 
-        if(str_count.equals("-1")) { // 종료 조건
+        if(str_count.equals("0")) { // 종료 조건
             return false;
         }
 
