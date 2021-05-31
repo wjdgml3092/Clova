@@ -1,5 +1,7 @@
 package com.example.clova.mypage;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -12,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,22 +34,22 @@ import java.util.Map;
 
 public class MyPageFragment extends Fragment {
 
-    TextView tex1, tex2;
-    EditText me;
-    Button bnt_logout, btn_memberdelete, btn_mess;
+    TextView fixtext, write_count;
+    Button modify_info, modify_message, notice, QandA ,discard_account ,logout;
     String user_id = null;
+    Map<String , Object> user_count = new HashMap<>();
     private FirebaseAuth user_auth;
     FirebaseFirestore firebaseFirestore;
-    Map<String , Object> user_count = new HashMap<>();
     String str_count = null;
-
+    String email = null;
+    final String[] items = {"YES", "NO"};
     public MyPageFragment() {
         // Required empty public constructor
     }
 
     public static MyPageFragment newInstance() {
-       MyPageFragment myPageFragment = new MyPageFragment();
-       return myPageFragment;
+        MyPageFragment myPageFragment = new MyPageFragment();
+        return myPageFragment;
     }
 
     @Override
@@ -61,106 +62,119 @@ public class MyPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_my_page, container, false);
+        View view = inflater.inflate(R.layout.fragment_mypage, container, false);
 
-        tex1 = view.findViewById(R.id.te1);
-        tex2= view.findViewById(R.id.te2);
-        bnt_logout = view.findViewById(R.id.btn1);
-        btn_memberdelete = view.findViewById(R.id.btn2);
-        btn_mess = view.findViewById(R.id.btn3);
-        me = view.findViewById(R.id.me);
-
+        fixtext = view.findViewById(R.id.fixText);
+        modify_info = view.findViewById(R.id.modify_info);
+        modify_message = view.findViewById(R.id.modify_message);
+        notice = view.findViewById(R.id.notice);
+        QandA = view.findViewById(R.id.QandA);
+        write_count = view.findViewById(R.id.write_count);
+        discard_account = view.findViewById(R.id.discard_account);
+        logout = view.findViewById(R.id.logout);
         user_auth = FirebaseAuth.getInstance(); //로그아웃 위해 필요함
-
         FirebaseUser user = user_auth.getCurrentUser(); //현재 사용자 받아오기
-
-        //firebase 정의
         firebaseFirestore = FirebaseFirestore.getInstance();
 
-       if (user != null) {
-            String name = user.getDisplayName();
-            String email = user.getEmail();
-            tex1.setText(email);
-
-            // Check if user's email is verified
-            boolean emailVerified = user.isEmailVerified();
+        if (user != null) {
+            email = user.getEmail();
+            fixtext.setText("- " + email+"님");
 
             String uid = user.getUid();
             user_id = uid; // 아이디 변수에 넣기
-            tex2.setText(uid);
         }
         else{
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             startActivity(intent);
             //finish();
         }
+        call_count(user_id);
 
-        bnt_logout.setOnClickListener(new View.OnClickListener() { //로그아웃
+        modify_info.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
+                String emailAddress = email;
+                user_auth.sendPasswordResetEmail(emailAddress)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d("password", "Email sent.");
+                                    Toast myToast = Toast.makeText(getContext(),"이메일을 확인하세요.", Toast.LENGTH_SHORT);
+                                    myToast.show();
+                                }
+                            }
+                        });
+            }
+        });
+        modify_message.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                ModifyMessage modifyMessage = new ModifyMessage();
+                transaction.replace(R.id.main_frame, modifyMessage);
+                transaction.commit();
+            }
+        });
+        notice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                Notice notice = new Notice();
+                transaction.replace(R.id.main_frame, notice);
+                transaction.commit();
+            }
+        });
+        QandA.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                QandAFragment QandAFragment = new QandAFragment();
+                transaction.replace(R.id.main_frame, QandAFragment);
+                transaction.commit();
+            }
+        });
+        discard_account.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+                dialog.setTitle("정말 탈퇴 하시겠습니까?")
+                        .setMessage("탈퇴에 관해, ")
+                        .setNegativeButton("닫기", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                MyPageFragment myPageFragment = new MyPageFragment();
+                                transaction.replace(R.id.main_frame, myPageFragment);
+                                transaction.commit();
+                            }
+                        })
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                member_delete(user);
+                                Log.d("discard", "탈퇴완료");
+                                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                                MyPageFragment myPageFragment = new MyPageFragment();
+                                transaction.replace(R.id.main_frame, myPageFragment);
+                                transaction.commit();
+                            }
+                        })
+                        .show();
+            }
+        });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 user_auth.signOut();
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 getActivity().finish();  //finish() 사용법 -> 현재 조각이 연결된 활동을 완료한다!
             }
         });
-
-        btn_memberdelete.setOnClickListener(new View.OnClickListener() { //회원탈퇴
-            @Override
-            public void onClick(View v) {
-                Log.d("delete-member-btnclick", "버튼을 누르긴 했어,,");
-                user.delete()
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(getActivity(), "계정이 삭제 되었습니다.", Toast.LENGTH_LONG).show();
-                                    filed_Delete(user_id);
-                                    Log.d("delete-member", "성공");
-                                    startActivity(new Intent(getActivity(), LoginActivity.class));
-                                    getActivity().finish();
-                                }
-                                else{
-                                    Log.d("delete-member-err", "탈퇴 실패");
-                                }
-                            }
-                        });
-            }
-        });
-
-        call_count(user_id); // count 값 가져오기
-
-        btn_mess.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = me.getText().toString();
-
-                Map<String, Object> user_info = new HashMap<>();
-                user_info.put("message", message);
-                user_info.put("count", str_count);
-
-                firebaseFirestore.collection("User").document(user_id)
-                        .set(user_info)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("User", "DocumentSnapshot successfully written!");
-                                Toast.makeText(getActivity(), "응원메시지가 입력되었습니다!", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("User", "Error writing document", e);
-                            }
-                        });
-            }
-        });
-
-
         return view;
-    }
+        }
 
-    void call_count(String user_id){
+    void call_count(String user_id) {
         DocumentReference docRef = firebaseFirestore.collection("User").document(user_id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -169,9 +183,9 @@ public class MyPageFragment extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         user_count = document.getData();
-
-                        str_count = (String)user_count.get("count");
+                        str_count = (String) user_count.get("count");
                         Log.d("mypage-count", str_count);
+                        write_count.setText("기록일수 : " + str_count + "일");
                     } else {
                         Log.d("write", "No such document");
                     }
@@ -182,23 +196,42 @@ public class MyPageFragment extends Fragment {
         });
     }
 
-    void filed_Delete(String user_id){
-        //    DocumentReference docRef = user_table.collection("User").document(user_id);
-
-        firebaseFirestore.collection("User").document(user_id)
-                .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+    void member_delete(FirebaseUser user){ //회원탈퇴
+        user.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("User-delete", "DocumentSnapshot successfully deleted!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("User-delete", "Error deleting document", e);
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getActivity(), "계정이 삭제 되었습니다.", Toast.LENGTH_LONG).show();
+                            filed_Delete(user_id); // 회원 내용 지우기
+                            Log.d("delete-member", "성공");
+                            startActivity(new Intent(getActivity(), LoginActivity.class));
+                            getActivity().finish();
+                        }
+                        else{
+                            Log.d("delete-member-err", "탈퇴 실패");
+                        }
                     }
                 });
-    }
 
+    }
+        void filed_Delete(String user_id){
+            //    DocumentReference docRef = user_table.collection("User").document(user_id);
+            firebaseFirestore.collection("User").document(user_id)
+                    .delete()
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("User-delete", "DocumentSnapshot successfully deleted!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("User-delete", "Error deleting document", e);
+                        }
+                    });
+
+    }
 }
+
