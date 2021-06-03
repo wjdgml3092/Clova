@@ -201,12 +201,11 @@
                     android:textColor="#0000FF"
                     android:textSize="15dp" />
             </LinearLayout>
-
             <LinearLayout
                 android:id="@+id/linear5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 app:layout_constraintLeft_toLeftOf="@+id/linear4"
                 app:layout_constraintTop_toBottomOf="@+id/linear4"
                 tools:ignore="MissingConstraints">
@@ -219,49 +218,66 @@
                     android:text="Image"
                     android:textSize="20dp" />
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linear_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginRight="10dp"
+                app:layout_constraintBottom_toBottomOf="@+id/linear5">
+
                 <Button
                     android:id="@+id/bt_choose"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="80dp"
+                    android:layout_height="30dp"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/btn_shape"
                     android:text="Choose"
                     android:textColor="@color/black"
-                    android:textSize="10dp" />
+                    android:textSize="10dp"
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/bt_upload"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_width="80dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/btn_shape"
                     android:text="Upload"
                     android:textColor="@color/black"
-                    android:textSize="10dp" />
+                    android:textSize="10dp"
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/bt_delete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_width="80dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/btn_shape"
                     android:text="Delete"
                     android:textColor="@color/black"
-                    android:textSize="10dp" />
+                    android:textSize="10dp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/img_linear"
-                android:layout_width="280dp"
-                android:layout_height="250dp"
-                android:layout_marginTop="40dp"
-                app:layout_constraintRight_toRightOf="@+id/line"
-                app:layout_constraintTop_toTopOf="@+id/linear5">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/linear5"
+                app:layout_constraintLeft_toLeftOf="@+id/linear5">
 
                 <ImageView
                     android:id="@+id/iv_preview"
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content" />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:adjustViewBounds="true"
+                    android:layout_gravity="center"/>
 
             </LinearLayout>
 
@@ -280,7 +296,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/black"
                     android:contentDescription="addDiary"
                     app:srcCompat="@android:drawable/ic_btn_speak_now" />
 
@@ -300,8 +315,10 @@
                     android:layout_height="38dp"
                     android:layout_gravity="right"
                     android:layout_marginBottom="10dp"
+                    android:textStyle="bold"
                     android:layout_margin="10dp"
                     android:background="@drawable/feelbtn_shape"
+                    android:textColor="@color/black"
                     android:text="저장" />
 
             </LinearLayout>
@@ -311,5 +328,6 @@
 
 
     </ScrollView>
+
 
 </LinearLayout>

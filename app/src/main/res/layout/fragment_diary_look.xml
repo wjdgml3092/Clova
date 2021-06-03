@@ -181,9 +181,10 @@
 
                 <ImageView
                     android:id="@+id/img"
-                    android:layout_width="300dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:adjustViewBounds="true"
                     android:layout_gravity="center"/>
 
                 <TextView
@@ -236,7 +237,9 @@
                     android:layout_gravity="right"
                     android:layout_marginBottom="10dp"
                     android:layout_marginRight="10dp"
+                    android:textColor="@color/black"
                     android:background="@drawable/feelbtn_shape"
+                    android:textStyle="bold"
                     android:text="수정" />
 
             </LinearLayout>
