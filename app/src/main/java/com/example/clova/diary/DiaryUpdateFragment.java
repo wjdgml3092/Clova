@@ -379,6 +379,7 @@ public class DiaryUpdateFragment extends Fragment {
                                     @Override
                                     public void onSuccess(Uri uri) {
                                         //다운로드 URL이 파라미터로 전달되어 옴.
+                                        ivPreview.setBackgroundDrawable(getResources().getDrawable(R.drawable.img_edge));
                                         Glide.with(content.getContext()).load(uri).into(ivPreview);
                                     }
                                 });
