@@ -134,7 +134,7 @@ public class DiaryWriteFragment extends Fragment {
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), R.style.DialogTheme,
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), 0,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int day) {
@@ -154,7 +154,9 @@ public class DiaryWriteFragment extends Fragment {
                                 date.setText(chooseDate);
                             }
                         }, year, month, day);
+
                 datePickerDialog.show();
+
             }
         });
 
