@@ -384,6 +384,7 @@ public class DiaryWriteFragment extends Fragment {
                         Log.w("diary-write", "Error writing document", e);
                     }
                 });
+
     }
 
     void setcount(String user_id) {

@@ -48,25 +48,6 @@ public class PictureFragment extends Fragment {
 
     private final int PERMISSIONS_REQUEST_RESULT = 100;
 
-    public boolean requestPermissionCamera(){
-        int sdkVersion = Build.VERSION.SDK_INT;
-        if(sdkVersion >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                    PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                        || ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                } else {
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                            PERMISSIONS_REQUEST_RESULT);
-                }
-            } else {
-            }
-        } else{
-        }
-        return true;
-    }
     public PictureFragment() {
         // Required empty public constructor
     }
@@ -86,7 +67,7 @@ public class PictureFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.activity_picture, container, false);
+        View view = inflater.inflate(R.layout.fragment_picture, container, false);
 
         //startActivity(new Intent(getActivity(), PictureActivity.class));
         canvasContainer = view.findViewById(R.id.lo_canvas);
@@ -102,6 +83,8 @@ public class PictureFragment extends Fragment {
 
         return view;
     }
+
+
     /**
      * OnClickListener Setting
      */
@@ -115,9 +98,7 @@ public class PictureFragment extends Fragment {
         });
 
         fbSave.setOnClickListener((v) -> {
-            requestPermissionCamera();
             drawCanvas.invalidate();
-            requestPermissionCamera();
             Bitmap saveBitmap = drawCanvas.getCurrentCanvas();
             Toast.makeText(getContext(),"저장", Toast.LENGTH_SHORT).show();
             CanvasIO.saveBitmapToJpg(saveBitmap, getContext());
