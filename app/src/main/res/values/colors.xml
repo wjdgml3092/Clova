@@ -12,4 +12,12 @@
 
     <!--   a secondary color for controls like checkboxes and text fields -->
     <color name="colorAccent">#BCE067</color>
+
+    <color name="darkblue"> #0000FF</color>
+
+    <color name="orange"> #FFBB00</color>
+
+    <color name="blue"> #5CD1E5 </color>
+
+    <color name="red"> #F15F5F </color>
 </resources>
