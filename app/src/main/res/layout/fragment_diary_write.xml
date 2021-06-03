@@ -84,8 +84,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
                     android:layout_marginTop="15dp"
-                    android:hint="(공백 포함 20자 이내 가능)"
-                    android:maxLength="20"
+                    android:inputType="text"
+                    android:maxLines="1"
                     android:textSize="15dp" />
             </LinearLayout>
 
@@ -280,10 +280,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/black"
                     android:contentDescription="addDiary"
                     app:srcCompat="@android:drawable/ic_btn_speak_now" />
-
+.
                 <EditText
                     android:id="@+id/content"
                     android:layout_width="370dp"
