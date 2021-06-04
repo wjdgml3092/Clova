@@ -101,13 +101,13 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:backgroundTint="@color/white"
-        android:text="공지사항"
+        android:text="Q &amp; A"
         android:textColor="@color/black"
         android:textSize="15dp"
         app:layout_constraintTop_toBottomOf="@+id/modify_me_name" />
 
     <Button
-        android:id="@+id/QandA"
+        android:id="@+id/tuto"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:backgroundTint="@color/white"
@@ -124,7 +124,7 @@
         android:text="회원탈퇴"
         android:textColor="@color/black"
         android:textSize="15dp"
-        app:layout_constraintTop_toBottomOf="@+id/QandA" />
+        app:layout_constraintTop_toBottomOf="@+id/tuto" />
 
     <Button
         android:id="@+id/logout"
@@ -139,12 +139,17 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="clova@gmail.com 고객센터"
-        android:textAlignment="center"
+        android:textSize="13dp"
         android:textColor="#AAAAAA"
-        android:textSize="10dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:textAlignment="center"
+        android:text="Copyright 2021.hyejin,junghee.All right reserved."
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintVertical_bias="0.95"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
