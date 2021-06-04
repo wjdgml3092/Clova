@@ -35,8 +35,8 @@ import java.util.Map;
 
 public class MyPageFragment extends Fragment {
 
-    TextView fixtext, write_count;
-    Button modify_info, modify_message, notice, QandA, discard_account, logout;
+    TextView fixtext;
+    Button modify_info, modify_me_name, notice, QandA, discard_account, logout;
     String user_id = null;
     Map<String, Object> user_count = new HashMap<>();
     String str_count = null;
@@ -104,7 +104,7 @@ public class MyPageFragment extends Fragment {
             }
         });
 
-        modify_message.setOnClickListener(new View.OnClickListener() {
+        modify_me_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -177,10 +177,9 @@ public class MyPageFragment extends Fragment {
     void id_init(View view) {
         fixtext = view.findViewById(R.id.fixText);
         modify_info = view.findViewById(R.id.modify_info);
-        modify_message = view.findViewById(R.id.modify_message);
+        modify_me_name = view.findViewById(R.id.modify_me_name);
         notice = view.findViewById(R.id.notice);
         QandA = view.findViewById(R.id.QandA);
-        write_count = view.findViewById(R.id.write_count);
         discard_account = view.findViewById(R.id.discard_account);
         logout = view.findViewById(R.id.logout);
     }
@@ -196,7 +195,6 @@ public class MyPageFragment extends Fragment {
                         user_count = document.getData();
                         str_count = (String) user_count.get("count");
                         Log.d("mypage-count", str_count);
-                        write_count.setText("기록일수 : " + str_count + "일");
                     } else {
                         Log.d("write", "No such document");
                     }
