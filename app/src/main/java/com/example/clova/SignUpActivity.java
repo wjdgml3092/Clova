@@ -88,7 +88,7 @@ public class SignUpActivity extends AppCompatActivity {
                 if (passWordVali.matches(passwordValidation) && passWordVali.length() > 0) {
                     password_vali_check.setError(null);
                 } else {
-                    password_vali_check.setError("최소 8자이상 숫자,문자,특수문자를 입력해주세요");
+                    password_vali_check.setError("최소 7자이상 숫자,문자,특수문자를 입력해주세요");
                 }
             }
         });
@@ -205,8 +205,8 @@ public class SignUpActivity extends AppCompatActivity {
                 if (checkBox.isChecked() && checkBox2.isChecked() && checkBox3.isChecked()) {
                     createUser(emailVali, passWordVali);
                 } else {
-                    // 이메일과 비밀번호가 공백인 경우
-                    Toast.makeText(SignUpActivity.this, "계정과 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show();
+                    // 체크박스 동의를 하나라도 안한경우
+                    Toast.makeText(SignUpActivity.this, "약관을 동의해주세요.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

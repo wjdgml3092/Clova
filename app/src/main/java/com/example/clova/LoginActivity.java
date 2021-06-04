@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,9 +33,8 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private EditText editTextEmail;
     private EditText editTextPassword;
-    private Button buttonLogIn;
-    private Button buttonSignUp;
-
+    private Button buttonLogIn,buttonSignUp,searchBtn;
+    private String email = null;
     boolean verified = false; //이메일 인증 확인 boolean 변수
 
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
@@ -53,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         editTextEmail = (EditText) findViewById(R.id.edittext_email);
         editTextPassword = (EditText) findViewById(R.id.edittext_password);
         buttonLogIn = (Button) findViewById(R.id.btn_login);
+        searchBtn = (Button) findViewById(R.id.search_password);
 
         buttonLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +65,39 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(LoginActivity.this, "계정과 비밀번호를 입력하세요.", Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(LoginActivity.this);
+                dialog.setTitle("비밀번호를 찾으실 이메일을 입력해주세요.");
+                final EditText email = new EditText(LoginActivity.this);
+                 InputFilter[] FilterArray = new InputFilter[1];
+                 FilterArray[0] = new InputFilter.LengthFilter(30);//글자수 제한
+                 email.setFilters(FilterArray);
+                 dialog.setView(email);
+
+                dialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) { //확인 버튼을 클릭했을때
+                        String userEmail = email.getText().toString();
+                        firebaseAuth.sendPasswordResetEmail(userEmail)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(LoginActivity.this, "이메일을 확인하세요.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                    }
+                });
+                dialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) { //취소 버튼을 클릭
+                        Toast myToast = Toast.makeText(LoginActivity.this, "취소하셨습니다.", Toast.LENGTH_SHORT);
+                    }
+                });
+                dialog.show();
             }
         });
 
@@ -165,9 +200,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Toast.makeText(LoginActivity.this,"이메일을 원치 않으십니다.",Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
             }
         });
         dlg.show();
@@ -176,7 +208,7 @@ public class LoginActivity extends AppCompatActivity {
     void settingMessage(String user_id, FirebaseFirestore firebaseFirestore){
 
         Map<String, Object> user_me = new HashMap<>();
-        user_me.put("message", "오늘 하루도 고생하셨습니다.");
+        user_me.put("message", "월급은 스쳐가는 바람일 뿐");
         user_me.put("count", "0");
         user_me.put("nickname", "Clova");
 
@@ -294,7 +326,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         else {
         }
-       // firebaseAuth.addAuthStateListener(authStateListener);
+        // firebaseAuth.addAuthStateListener(authStateListener);
     }
 
     @Override
