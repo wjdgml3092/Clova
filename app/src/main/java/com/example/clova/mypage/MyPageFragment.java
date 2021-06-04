@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import com.example.clova.LoginActivity;
 import com.example.clova.R;
-import com.example.clova.SignUpActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -41,6 +40,9 @@ public class MyPageFragment extends Fragment {
     Map<String, Object> user_count = new HashMap<>();
     String str_count = null;
     String email = null;
+
+    String nickname = "Clova";
+    String message = "월급은 스쳐가는 바람일 뿐";
 
     private FirebaseAuth user_auth = FirebaseAuth.getInstance(); //로그아웃 위해 필요함
 
@@ -75,7 +77,6 @@ public class MyPageFragment extends Fragment {
 
         if (user != null) {
             email = user.getEmail();
-            fixtext.setText("- " + email + "님");
 
             String uid = user.getUid();
             user_id = uid; // 아이디 변수에 넣기
@@ -84,6 +85,7 @@ public class MyPageFragment extends Fragment {
             startActivity(intent);
             //finish();
         }
+
         call_count(user_id);
 
         modify_info.setOnClickListener(new View.OnClickListener() {
@@ -104,12 +106,12 @@ public class MyPageFragment extends Fragment {
             }
         });
 
-        modify_me_name.setOnClickListener(new View.OnClickListener() {
+        modify_me_name.setOnClickListener(new View.OnClickListener() { //응원메시지, 닉네임 수정
             @Override
             public void onClick(View view) {
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                ModifyMessage modifyMessage = new ModifyMessage();
-                transaction.replace(R.id.main_frame, modifyMessage);
+                ModifyMessageNickname modifyMessageNickname = new ModifyMessageNickname();
+                transaction.replace(R.id.main_frame, modifyMessageNickname);
                 transaction.commit();
             }
         });
@@ -194,8 +196,12 @@ public class MyPageFragment extends Fragment {
                     if (document.exists()) {
                         user_count = document.getData();
                         str_count = (String) user_count.get("count");
-                        Log.d("mypage-count", str_count);
-                    } else {
+                        message = (String) user_count.get("message");
+                        nickname = (String) user_count.get("nickname");
+
+                        fixtext.setText(nickname + " 님"); // 닉네임 설정
+                    }
+                    else {
                         Log.d("write", "No such document");
                     }
                 } else {
