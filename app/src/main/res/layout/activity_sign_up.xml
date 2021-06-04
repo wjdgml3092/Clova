@@ -70,7 +70,6 @@
                 android:layout_width="270dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:fontFamily="@font/bell"
                 android:hint="비밀번호를 입력해주세요"
                 android:inputType="textPassword" />
 
@@ -95,7 +94,6 @@
                 android:ems="10"
                 android:hint="비밀번호를 재 입력해주세요"
                 android:inputType="textPassword"
-                android:fontFamily="@font/bell"
                 tools:ignore="MissingConstraints" />
         </com.google.android.material.textfield.TextInputLayout>
 
