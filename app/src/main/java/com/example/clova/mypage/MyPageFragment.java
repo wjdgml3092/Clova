@@ -144,8 +144,8 @@ public class MyPageFragment extends Fragment {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                filed_Delete(user_id);
-                                //member_delete(user);
+                                int k = 1;
+                                delete_diary(user_id, k, str_count);
                                 Log.d("discard", "탈퇴완료");
                             }
                         })
@@ -207,59 +207,24 @@ public class MyPageFragment extends Fragment {
         });
     }
 
-    void filed_Delete(String user_id) {
-        //    DocumentReference docRef = user_table.collection("User").document(user_id);
+    void delete_diary(String user_id, int k, String str_count) {
+
+        int result = Integer.parseInt(str_count);
 
         firebaseFirestore.collection("Diary").document(user_id)
+                .collection(Integer.toString(k)).document(user_id)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("User-delete1", "DocumentSnapshot successfully deleted!");
-                        firebaseFirestore.collection("Feel").document(user_id)
-                                .delete()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d("User-delete2", "DocumentSnapshot successfully deleted!");
-
-                                        firebaseFirestore.collection("User").document(user_id)
-                                                .delete()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        Log.d("User-delete3", "DocumentSnapshot successfully deleted!");
-                                                        user.delete()
-                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                        if (task.isSuccessful()) {
-                                                                            Toast.makeText(getActivity(), "탈퇴에 성공했습니다. 그동안 이용해주셔서 감사합니다.", Toast.LENGTH_SHORT).show();
-                                                                           // filed_Delete(user_id); // 회원 내용 지우기
-                                                                            Log.d("delete-member", "성공");
-                                                                            getActivity().finish();
-                                                                            startActivity(new Intent(getActivity(), LoginActivity.class));
-                                                                        } else {
-                                                                            Log.d("delete-member-err", "탈퇴 실패");
-                                                                        }
-                                                                    }
-                                                                });
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.w("User-delete", "Error deleting document", e);
-                                                    }
-                                                });
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w("User-delete", "Error deleting document", e);
-                                    }
-                                });
+                        int num = k;
+                        Log.d("delete-num_diary", "DocumentSnapshot successfully deleted!");
+                        if(num < result)
+                            delete_diary(user_id, ++num, Integer.toString(result));
+                        else {
+                            int i = 0;
+                            delete_feel(user_id, i);
+                        }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -268,25 +233,26 @@ public class MyPageFragment extends Fragment {
                         Log.w("User-delete", "Error deleting document", e);
                     }
                 });
-
-
-//        delete_feel(user_id, "행복");
-//        delete_feel(user_id, "웃김");
-//        delete_feel(user_id, "슬픔");
-//        delete_feel(user_id, "화남");
-
-
-       //member_delete(user);
     }
 
-  /*  void delete_feel(String user_id, String feel){
+    void delete_feel(String user_id, int i) {
+
+        String[] feel_arr = new String[]{"행복", "웃김", "슬픔", "화남"};
 
         firebaseFirestore.collection("Feel").document(user_id)
-                .collection(feel).document(user_id)
+                .collection(feel_arr[i]).document(user_id)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        int num = i;
+                        Log.d("delete-num_feel", feel_arr[num]);
+
+                        if (num < 3)
+                            delete_feel(user_id, ++num);
+                        else
+                            delete_user(user_id);
+
                         Log.d("User-delete", "DocumentSnapshot successfully deleted!");
                     }
                 })
@@ -296,7 +262,42 @@ public class MyPageFragment extends Fragment {
                         Log.w("User-delete", "Error deleting document", e);
                     }
                 });
-    }*/
+    }
 
+    void delete_user(String user_id) {
+        firebaseFirestore.collection("User").document(user_id)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("User-delete3", "DocumentSnapshot successfully deleted!");
+                        member_user(user);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("User-delete", "Error deleting document", e);
+                    }
+                });
+    }
+
+    void member_user(FirebaseUser user){
+        user.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getActivity(), "탈퇴에 성공했습니다. 그동안 이용해주셔서 감사합니다.", Toast.LENGTH_SHORT).show();
+                            // filed_Delete(user_id); // 회원 내용 지우기
+                            Log.d("delete-member", "성공");
+                            getActivity().finish();
+                            startActivity(new Intent(getActivity(), LoginActivity.class));
+                        } else {
+                            Log.d("delete-member-err", "탈퇴 실패");
+                        }
+                    }
+                });
+    }
 }
 
