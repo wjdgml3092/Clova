@@ -30,6 +30,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.clova.LoginActivity;
 import com.example.clova.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -70,6 +71,7 @@ public class DiaryWriteFragment extends Fragment {
     private Uri filePath = null;
 
     String message = null;
+    String nickname = null;
     String str_content; // 입력 텍스트 string으로
     String user_id; // user_id string
     int count; // user테이블에 count 얻어오는변수
@@ -190,26 +192,10 @@ public class DiaryWriteFragment extends Fragment {
                 //널체크 해주기
                 hash1check = hashtag1.getText().toString();
                 Log.d("diary-write hash1", hash1check);
-                /* if(hash1check.length() != 0)
-                    hash1check = "#" + hash1check;
-                else
-                    hash1check = ""; */
 
                 hash2check = hashtag2.getText().toString();
-                /*Log.d("diary-write hash2", hash2check);
-
-                if(hash2check.length() != 0) {
-                    hash2check = "#" + hash2check;
-                }
-                else
-                    hash2check = ""; */
 
                 hash3check = hashtag3.getText().toString();
-               /* Log.d("diary-write hash3", hash3check);
-                if(hash3check.length() != 0)
-                    hash3check = "#" + hash3check;
-                else
-                    hash3check = ""; */
 
                 //내용
                 str_content = content.getText().toString();
@@ -337,6 +323,7 @@ public class DiaryWriteFragment extends Fragment {
                         String str_count = (String) user_count.get("count");
                         message = (String) user_count.get("message");
                         count = Integer.parseInt(str_count) + 1;
+                        nickname = (String) user_count.get("nickname");
                         Log.d("write-callcount", Integer.toString(count));
 
                         setcount(user_id);
@@ -385,6 +372,52 @@ public class DiaryWriteFragment extends Fragment {
                     }
                 });
 
+        DocumentReference docRef = firebaseFirestore.collection("Feel").document(user_id)
+                .collection(feelcheck).document(user_id);
+        Log.d("diary-inner feel", feelcheck);
+
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                         Map<String, Object> feel_info = new HashMap<>();
+                        feel_info = document.getData();
+                         String get_feelcnt = feel_info.get("feel_count").toString();
+
+                         int feet_cnt = Integer.parseInt(get_feelcnt) + 1;
+                         get_feelcnt = Integer.toString(feet_cnt);
+
+                        Map<String, Object> diary_feel = new HashMap<>();
+                        diary_feel.put("feel_count", get_feelcnt);
+
+                        firebaseFirestore.collection("Feel").document(user_id)
+                                .collection(feelcheck).document(user_id)
+                                .set(diary_feel)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d("diary-write-feel", "성공");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w("diary-write", "Error writing document", e);
+                                    }
+                                });
+
+
+                    } else {
+                        Log.d("diary", "No such document");
+                    }
+                } else {
+                    Log.d("diary", "get failed with ", task.getException());
+                }
+            }
+        });
+
     }
 
     void setcount(String user_id) {
@@ -393,6 +426,7 @@ public class DiaryWriteFragment extends Fragment {
         Map<String, Object> cnt = new HashMap<>();
         cnt.put("count", setcnt);
         cnt.put("message", message);
+        cnt.put("nickname", nickname);
 
         Log.d("write-setcount", setcnt);
         firebaseFirestore.collection("User").document(user_id)
