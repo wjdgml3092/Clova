@@ -2,12 +2,38 @@
     <string name="app_name">Clova</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="underlined_text"><u>보기</u></string>
+
     <string name="app_arg">본 약관은 clova가 제공하는 ‘Clova’에 관한 모든 제품 및 서비스(이하 ‘서비스’라 함)를 이용함에 있어 이용자의 권리_의무 및 책임에 관한 사항을 규정함을 목적으로 합니다.
 『인터넷, 정보통신망, 모바일 및 스마트 장치 등을 이용하는 전자상거래에 대해서도 그 성질에 반하지 않는 한 이 약관을 준용합니다』</string>
+
     <string name="app_arg2">개인정보보호위원회가 취급하는 모든 개인정보는 관련 법령에 근거하여 수집 · 보유 및 처리되고 있습니다.
         「개인정보보호법」은 이러한 개인정보의 취급에 대한 일반적 규범을 제시하고 있으며,
         개인정보보호위원회는 이러한 법령의 규정에 따라 수집 · 보유 및 처리하는 개인정보를 공공업무의 적절한 수행과 이용자의 권익을 보호하기 위해 적법하고 적정하게 취급할 것입니다.</string>
+
     <string name="app_arg3">이 약관은 clova가 제공하는 위치정보사업 또는 위치기반서비스사업과 관련하여
         회사와 개인위치정보주체와의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</string>
+
+    <string name="q1">Q1. 스토리 통계, 감정 통계는 어떤 기준인가요?</string>
+
+    <string name="a1">A1. 스토리, 감정 통계는 Clova를 이용한 시점부터 기록한 누적 횟수입니다.</string>
+
+    <string name="q2">Q2. 달성률은 어떻게 계산이 되나요?</string>
+
+    <string name="a2">A2. 한 달을 30일 기준으로 15일 기록 시 50%가 됩니다. 이렇게 한 달 누적 획수로 계산이 됩니다.</string>
+
+    <string name="q3">Q3. 글 작성했는데 목록에서 보이지 않아요.</string>
+
+    <string name="a3">A3. 리스트를 위에서 아래로 스크롤하여 새로고침 한번 부탁드립니다. 일기가 나오지 않는다면 clova@gmail.com 연락 한번 부탁드리겠습니다.</string>
+
+    <string name="q4">Q4. 닉네임, 응원 메시지는 변경이 안되나요?</string>
+
+    <string name="a4">A4. MyPage에서 닉네임, 응원메시지 모두 변경이 가능합니다:)</string>
+
+    <string name="q5">Q5. 그림이 저장되지 않습니다.</string>
+
+    <string name="a5">A5. 권한이 해제되어있을수 있습니다. [설정] > [권한]에서 권한 허용을 한 후 다시 시도해주세요.</string>
+
+    <string name="ref">😊Q&amp;A를 참고 외에 불편함을 느끼실 경우. => clova.gmail.com으로 메일 보내주세요.😊</string>
 </resources>

@@ -1,93 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-
-    <TextView
-        android:id="@+id/know_mypage"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Q&amp;A"
-        android:textSize="25dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints" />
-
-    <View
-        android:id="@+id/line"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_margin="10dp"
-        android:background="#CCCCCC"
-        app:layout_constraintTop_toBottomOf="@+id/know_mypage" />
-
-    <LinearLayout
-    android:id="@+id/line1"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    tools:ignore="MissingConstraints"
-    android:layout_marginTop="25dp"
-    app:layout_constraintTop_toBottomOf="@+id/line">
-    <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:text="1.글을 썼는데 리스트가 안보여요.\n  -> 리스트를 위에서 아래로 스크롤하여\n   새로고침해주세요."
-    android:textSize="20dp"
-    android:layout_marginStart="10dp"
-    android:layout_marginEnd="10dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/line2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        app:layout_constraintTop_toBottomOf="@+id/line1"
         tools:ignore="MissingConstraints">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="2.일기에 사진을 등록했는데 저장되지 않아요.\n -> 사진을 올리신 후에는 업로드 \n     버튼을 꼭 눌러주세요."
-            android:textSize="20dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp" />
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/line3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        app:layout_constraintTop_toBottomOf="@+id/line2"
-        tools:ignore="MissingConstraints">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="3.공지사항, Q&amp;A를 참고 외에 불편함을 느끼실 경우.\n  -> clova.gmail.com으로 메일 보내주세요" android:textSize="20dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp" />
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        app:layout_constraintTop_toBottomOf="@+id/line3"
-        tools:ignore="MissingConstraints">
-        <TextView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="4.삭제 기능이 없어요.\n  -> 삭제기능은 업데이트 중이므로 빠른시간 \n      내에 개선하도록 하겠습니다"
-            android:textSize="20dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp" />
-    </LinearLayout>
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/know_mypage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="10dp"
+                android:text="튜토리얼"
+                android:textSize="25dp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="MissingConstraints" />
+
+            <View
+                android:id="@+id/line"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_margin="10dp"
+                android:background="#CCCCCC"
+                app:layout_constraintTop_toBottomOf="@+id/know_mypage" />
+
+            <ImageView
+                android:id="@+id/tuto1"
+                android:layout_width="380dp"
+                android:layout_height="380dp"
+                android:src="@drawable/tuto1"
+                app:layout_constraintTop_toBottomOf="@+id/line"
+                tools:ignore="MissingConstraints" />
+
+
+            <ImageView
+                android:id="@+id/tuto2"
+                android:layout_width="380dp"
+                android:layout_height="380dp"
+                android:src="@drawable/tuto2"
+                app:layout_constraintTop_toBottomOf="@+id/tuto1"
+                tools:ignore="MissingConstraints" />
+
+            <ImageView
+                android:id="@+id/tuto3"
+                android:layout_width="380dp"
+                android:layout_height="380dp"
+                android:src="@drawable/tuto3"
+                app:layout_constraintTop_toBottomOf="@+id/tuto2"
+                tools:ignore="MissingConstraints" />
+
+            <ImageView
+                android:id="@+id/tuto4"
+                android:layout_width="380dp"
+                android:layout_height="380dp"
+                android:src="@drawable/tuto4"
+                app:layout_constraintTop_toBottomOf="@+id/tuto3"
+                tools:ignore="MissingConstraints" />
+
+            <ImageView
+                android:id="@+id/tuto5"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:src="@drawable/tuto5"
+                app:layout_constraintTop_toBottomOf="@+id/tuto4"
+                tools:ignore="MissingConstraints" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

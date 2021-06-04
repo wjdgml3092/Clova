@@ -86,6 +86,8 @@
                     android:layout_marginTop="15dp"
                     android:hint="(공백 포함 20자 이내 가능)"
                     android:maxLength="20"
+                    android:singleLine = "true"
+                    android:lines = "1"
                     android:textSize="15dp" />
             </LinearLayout>
 
@@ -176,6 +178,8 @@
                     android:layout_marginTop="15dp"
                     android:hint="#해시"
                     android:maxLength="3"
+                    android:singleLine = "true"
+                    android:lines = "1"
                     android:textColor="#0000FF"
                     android:textSize="15dp" />
 
@@ -187,6 +191,8 @@
                     android:layout_marginTop="15dp"
                     android:hint="#태그"
                     android:maxLength="3"
+                    android:singleLine = "true"
+                    android:lines = "1"
                     android:textColor="#0000FF"
                     android:textSize="15dp" />
 
@@ -198,6 +204,8 @@
                     android:layout_marginTop="15dp"
                     android:hint="#입력"
                     android:maxLength="3"
+                    android:singleLine = "true"
+                    android:lines = "1"
                     android:textColor="#0000FF"
                     android:textSize="15dp" />
             </LinearLayout>

@@ -1,12 +1,14 @@
 package com.example.clova.mypage;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
@@ -35,7 +37,7 @@ import java.util.Map;
 public class MyPageFragment extends Fragment {
 
     TextView fixtext;
-    Button modify_info, modify_me_name, notice, QandA, discard_account, logout;
+    Button modify_info, modify_me_name, notice, tuto, discard_account, logout;
     String user_id = null;
     Map<String, Object> user_count = new HashMap<>();
     String str_count = null;
@@ -91,15 +93,12 @@ public class MyPageFragment extends Fragment {
         modify_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String emailAddress = email;
-                user_auth.sendPasswordResetEmail(emailAddress)
+                user_auth.sendPasswordResetEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Log.d("password", "Email sent.");
-                                    Toast myToast = Toast.makeText(getContext(), "비밀번호 재설정 링크를 이메일로 전송했습니다.", Toast.LENGTH_SHORT);
-                                    myToast.show();
+                                if(task.isSuccessful()){
+                                    Toast.makeText(getActivity(), "비밀번호 변경 메일을 전송했습니다", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -126,7 +125,7 @@ public class MyPageFragment extends Fragment {
             }
         });
 
-        QandA.setOnClickListener(new View.OnClickListener() {
+        tuto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -181,7 +180,7 @@ public class MyPageFragment extends Fragment {
         modify_info = view.findViewById(R.id.modify_info);
         modify_me_name = view.findViewById(R.id.modify_me_name);
         notice = view.findViewById(R.id.notice);
-        QandA = view.findViewById(R.id.QandA);
+        tuto = view.findViewById(R.id.tuto);
         discard_account = view.findViewById(R.id.discard_account);
         logout = view.findViewById(R.id.logout);
     }
