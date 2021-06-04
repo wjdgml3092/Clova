@@ -29,14 +29,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModifyMessage extends Fragment {
-EditText modify_message;
-Button registerBtn;
-FirebaseAuth user_auth;
-FirebaseFirestore firebaseFirestore;
-Map<String , Object> user_count = new HashMap<>();
-String str_count = null;
-String user_id = null;
-public ModifyMessage() {
+    EditText modify_message;
+    Button registerBtn;
+    FirebaseAuth user_auth;
+    FirebaseFirestore firebaseFirestore;
+    Map<String, Object> user_count = new HashMap<>();
+    String str_count = null;
+    String user_id = null;
+    String nickname = null;
+
+    public ModifyMessage() {
     }
 
     public static ModifyMessage newInstance(String param1, String param2) {
@@ -74,6 +76,7 @@ public ModifyMessage() {
 
                 user_info.put("message", message);
                 user_info.put("count", str_count);
+                user_info.put("nickname",nickname);
 
                 firebaseFirestore.collection("User").document(user_id)
                         .set(user_info)
@@ -85,7 +88,7 @@ public ModifyMessage() {
                                 MyPageFragment myPageFragment = new MyPageFragment();
                                 transaction.replace(R.id.main_frame, myPageFragment);
                                 transaction.commit();
-                                Toast.makeText(getActivity(), "응원메시지가 입력되었습니다!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), "응원메시지가 변경되었습니다!", Toast.LENGTH_SHORT).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -98,6 +101,7 @@ public ModifyMessage() {
         });
         return view;
     }
+
     void call_count(String user_id) {
         DocumentReference docRef = firebaseFirestore.collection("User").document(user_id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -107,7 +111,7 @@ public ModifyMessage() {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         user_count = document.getData();
-
+                        nickname = (String) user_count.get("nickname");
                         str_count = (String) user_count.get("count");
                         Log.d("mypage-count", str_count);
                     } else {
@@ -118,5 +122,5 @@ public ModifyMessage() {
                 }
             }
         });
-     }
     }
+}

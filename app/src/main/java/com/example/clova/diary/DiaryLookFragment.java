@@ -74,9 +74,6 @@ public class DiaryLookFragment extends Fragment {
     FirebaseStorage storage = FirebaseStorage.getInstance();
     Map<String, Object> user_count = new HashMap<>(); // call_count 사용
     Map<String, Object> list = new HashMap<>(); // callLookList에서 사용
-    ArrayList<DiaryData> data = new ArrayList<>();
-
-   // ArrayList<DiaryData> data;
 
     public DiaryLookFragment() {
         // Required empty public constructor
@@ -173,7 +170,7 @@ public class DiaryLookFragment extends Fragment {
                         result_cnt = Integer.toString(num_cucnt - num_cnt);
                         Log.d("diary_look-계산", result_cnt);
 
-                        callLookList(user_id, data); // 계산된 count로 Diary 컬렉션에서 읽어와서 set해주기
+                        callLookList(user_id); // 계산된 count로 Diary 컬렉션에서 읽어와서 set해주기
 
                     } else {
                         Log.d("write", "No such document");
@@ -185,7 +182,7 @@ public class DiaryLookFragment extends Fragment {
         });
     }
 
-    private void callLookList(String user_id, ArrayList<DiaryData> data) { //리스트 불러오기
+    private void callLookList(String user_id) { //리스트 불러오기
         Log.d("diary-call_list-count", result_cnt);
 
         DocumentReference docRef = firebaseFirestore.collection("Diary").document(user_id)

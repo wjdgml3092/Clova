@@ -178,6 +178,7 @@ public class LoginActivity extends AppCompatActivity {
         Map<String, Object> user_me = new HashMap<>();
         user_me.put("message", "오늘 하루도 고생하셨습니다.");
         user_me.put("count", "0");
+        user_me.put("nickname", "Clova");
 
         Log.d("login-user_id = ", user_id);
         firebaseFirestore.collection("User").document(user_id)
@@ -194,6 +195,74 @@ public class LoginActivity extends AppCompatActivity {
                         Log.w("loginmess settings-no ", "Error writing document", e);
                     }
                 });
+
+        Map<String, Object> feel_info = new HashMap<>();
+        feel_info.put("feel_count", "0");
+
+        firebaseFirestore.collection("Feel").document(user_id)
+                .collection("행복").document(user_id)
+                .set(feel_info)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("login-mess settings ", "성공");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("loginmess settings-no ", "Error writing document", e);
+                    }
+                });
+
+        firebaseFirestore.collection("Feel").document(user_id)
+                .collection("웃김").document(user_id)
+                .set(feel_info)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("login-mess settings ", "성공");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("loginmess settings-no ", "Error writing document", e);
+                    }
+                });
+
+        firebaseFirestore.collection("Feel").document(user_id)
+                .collection("슬픔").document(user_id)
+                .set(feel_info)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("login-mess settings ", "성공");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("loginmess settings-no ", "Error writing document", e);
+                    }
+                });
+
+        firebaseFirestore.collection("Feel").document(user_id)
+                .collection("화남").document(user_id)
+                .set(feel_info)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("login-mess settings ", "성공");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("loginmess settings-no ", "Error writing document", e);
+                    }
+                });
+
     }
 
     @Override
